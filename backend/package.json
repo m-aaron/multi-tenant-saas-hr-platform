@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/core/server.ts",
+    "dev": "tsx watch --conditions @dev src/server.ts",
     "build": "tsc",
-    "start": "node dist/core/server.js"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,20 @@
     }
   },
   "type": "module",
+  "imports": {
+    "#config/*.js": {
+      "@dev": "./src/config/*.ts",
+      "default": "./dist/config/*.js"
+    },
+    "#modules/*.js": {
+      "@dev": "./src/modules/*.ts",
+      "default": "./dist/modules/*.js"
+    },
+    "#shared/*.js": {
+      "@dev": "./src/shared/*.ts",
+      "default": "./dist/shared/*.js"
+    }
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
