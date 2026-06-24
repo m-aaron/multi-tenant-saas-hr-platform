@@ -2,19 +2,13 @@
 
 ## Project Name
 
-HRFlow *(temporary project name)*
-
----
-
-## Project Type
-
 Multi-Tenant SaaS HR Management Platform
 
 ---
 
 ## Project Overview
 
-HRFlow is a web-based Human Resource Management (HRM) platform designed for small and medium-sized organizations to manage employee and organizational data in one centralized system.
+Multi-Tenant SaaS HR Management Platform is a web-based Human Resource Management (HRM) platform designed for small and medium-sized organizations to manage employee and organizational data in one centralized system.
 
 The platform follows a multi-tenant Software-as-a-Service (SaaS) architecture where multiple companies use the same application while maintaining complete separation of their data.
 
