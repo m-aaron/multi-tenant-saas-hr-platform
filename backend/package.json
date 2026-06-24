@@ -14,7 +14,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.8.0",
+      "version": "11.9.0",
       "onFail": "download"
     }
   },
@@ -35,11 +35,13 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.0.0",
+    "@types/pg": "^8.20.0",
     "eslint": "^10.5.0",
     "prettier": "^3.8.4",
     "tsx": "^4.22.4",
