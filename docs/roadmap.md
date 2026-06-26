@@ -322,19 +322,3 @@ Deliverables:
 Success Criteria:
 
 Project clearly demonstrates backend skills.
-
----
-
-# Current Focus
-
-Current Phase:
-
-Phase 0 — Planning
-
-Next Target:
-
-Phase 1 — Project Setup
-
-Rule:
-
-Do not start feature development before foundation setup.
