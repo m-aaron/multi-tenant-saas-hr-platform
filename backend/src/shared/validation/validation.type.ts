@@ -1,4 +1,4 @@
-import type { ZodType } from "zod";
+import { type ZodType } from "zod";
 
 export interface ValidationConfig {
     body?: ZodType<any>;
