@@ -182,6 +182,8 @@ Requirements:
 
 Architecture:
 
+Route
+↓
 Controller
 ↓
 Service
@@ -250,13 +252,13 @@ Profile:
 
 The following are intentionally excluded:
 
+* Leave Request
+* Attendance
 * Payroll
-* Attendance tracking
-* Recruitment system
-* Mobile application
-* Analytics dashboard
 * Notifications
-* AI functionality
+* Audit Logs
+* Subscription
+* Activity Tracking
 
 ---
 
