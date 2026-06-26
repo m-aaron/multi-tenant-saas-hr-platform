@@ -95,11 +95,9 @@ Tasks:
 
 Architecture:
 
-Controller
+Route
 ↓
 Service
-↓
-Repository
 ↓
 Database
 
