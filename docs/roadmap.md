@@ -16,7 +16,7 @@ Guiding Principle:
 
 Build foundations first.
 
-Avoid implementing business features before architecture, authentication, and project structure are stable.
+Avoid implementing business features before architecture, database design, authentication, and project structure are stable.
 
 ---
 
@@ -34,6 +34,7 @@ Deliverables:
 * Entities
 * User Flows
 * Roadmap
+* ERD
 
 Success Criteria:
 
@@ -74,7 +75,11 @@ Deliverables:
 
 Success Criteria:
 
-Backend can run locally using Docker.
+Backend runs locally through Docker.
+
+Status:
+
+Completed
 
 ---
 
@@ -90,7 +95,7 @@ Tasks:
 * Create layered architecture
 * Setup error handling
 * Setup validation
-* Setup logging 
+* Setup logging
 * Define API conventions
 
 Architecture:
@@ -111,9 +116,75 @@ Success Criteria:
 
 New features can be added consistently.
 
+Status:
+
+Completed
+
 ---
 
-# Phase 3 — Authentication & Authorization
+# Phase 3 — Domain Modeling + ERD
+
+Objective:
+
+Convert business requirements into entities and relationships.
+
+Tasks:
+
+* Define entities
+* Define relationships
+* Design ERD
+* Define multi-tenant rules
+* Define constraints
+* Define ownership rules
+
+Deliverables:
+
+* ERD
+* Multi-tenant strategy
+* Entity ownership
+
+Success Criteria:
+
+Database design can begin confidently.
+
+Status:
+
+Completed
+
+---
+
+# Phase 4 — Database Schema Design
+
+Objective:
+
+Convert ERD into PostgreSQL schema.
+
+Tasks:
+
+* Design database structure
+* Create SQL schema
+* Create migrations
+* Configure constraints
+* Configure indexes
+* Configure foreign keys
+* Configure soft delete strategy
+
+Deliverables:
+
+* Database schema
+* Migration files
+
+Success Criteria:
+
+Database structure supports MVP requirements.
+
+Status:
+
+In Progress
+
+---
+
+# Phase 5 — Authentication & Authorization
 
 Objective:
 
@@ -122,7 +193,7 @@ Implement identity and access management.
 Tasks:
 
 * Organization registration
-* User login
+* Login
 * Refresh tokens
 * Logout
 * Password hashing
@@ -140,7 +211,7 @@ Users authenticate securely.
 
 ---
 
-# Phase 4 — Organization Module
+# Phase 6 — Organization Module
 
 Objective:
 
@@ -162,7 +233,7 @@ Organizations become isolated tenants.
 
 ---
 
-# Phase 5 — User Management
+# Phase 7 — User Management
 
 Objective:
 
@@ -185,7 +256,7 @@ Organizations manage users independently.
 
 ---
 
-# Phase 6 — Department Module
+# Phase 8 — Department Module
 
 Objective:
 
@@ -208,7 +279,7 @@ Departments support employee grouping.
 
 ---
 
-# Phase 7 — Employee Module
+# Phase 9 — Employee Module
 
 Objective:
 
@@ -231,7 +302,7 @@ Employee management works with tenant isolation.
 
 ---
 
-# Phase 8 — Documentation
+# Phase 10 — Documentation
 
 Objective:
 
@@ -254,7 +325,7 @@ Developers can run and understand the project.
 
 ---
 
-# Phase 9 — Testing
+# Phase 11 — Testing
 
 Objective:
 
@@ -276,7 +347,7 @@ Core flows verified automatically.
 
 ---
 
-# Phase 10 — Production Readiness
+# Phase 12 — Production Readiness
 
 Objective:
 
@@ -296,11 +367,11 @@ Deliverables:
 
 Success Criteria:
 
-Application can run in production environments.
+Application runs in production.
 
 ---
 
-# Phase 11 — Portfolio Finalization
+# Phase 13 — Portfolio Finalization
 
 Objective:
 
@@ -309,9 +380,9 @@ Prepare project presentation.
 Tasks:
 
 * Improve README
-* Add screenshots
 * Add architecture diagrams
 * Publish repository
+* Portfolio preparation
 
 Deliverables:
 
@@ -319,4 +390,4 @@ Deliverables:
 
 Success Criteria:
 
-Project clearly demonstrates backend skills.
+Project clearly demonstrates backend engineering skills.
