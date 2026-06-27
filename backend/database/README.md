@@ -31,3 +31,4 @@ prefer composite uniqueness
 6. employees
 7. sessions
 8. activity_logs
+9. audit_logs

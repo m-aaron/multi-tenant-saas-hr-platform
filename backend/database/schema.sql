@@ -10,3 +10,4 @@
 \i migrations/0006_create_employees.sql
 \i migrations/0007_create_sessions.sql
 \i migrations/0008_create_activity_logs.sql
+\i migrations/0009_create_audit_logs.sql

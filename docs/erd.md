@@ -329,6 +329,8 @@ id - uuid, PK
 organization_id - uuid, FK
 actor_id - uuid, FK
 
+action - string
+
 event_type - string
 metadata - JSONB
 
