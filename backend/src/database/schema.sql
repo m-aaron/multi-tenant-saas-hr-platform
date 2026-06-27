@@ -1,0 +1,2 @@
+-- Multi-Tenant SaaS HR Platform
+-- PostgreSQL
