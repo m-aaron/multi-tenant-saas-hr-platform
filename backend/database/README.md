@@ -28,3 +28,4 @@ prefer composite uniqueness
 3. users
 4. profiles
 5. departments
+6. employees
