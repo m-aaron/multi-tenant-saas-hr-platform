@@ -9,3 +9,4 @@
 \i migrations/0005_create_departments.sql
 \i migrations/0006_create_employees.sql
 \i migrations/0007_create_sessions.sql
+\i migrations/0008_create_activity_logs.sql

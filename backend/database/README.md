@@ -30,3 +30,4 @@ prefer composite uniqueness
 5. departments
 6. employees
 7. sessions
+8. activity_logs
