@@ -37,8 +37,9 @@ Represents a customer company using the platform.
 Responsibilities:
 
 * Own users
-* Own departments
 * Own employees
+* Own departments
+* Own roles
 * Isolate tenant data
 
 Examples:
@@ -200,15 +201,15 @@ Employee
 # Relationship Summary
 
 Organization
-├── Users
-├── Departments
-└── Employees
+- Users
+- Departments
+- Employees
 
 User
-└── Role
+- Role
 
 Department
-└── Employees
+- Employees
 
 ---
 

@@ -90,7 +90,7 @@ Tasks:
 * Create layered architecture
 * Setup error handling
 * Setup validation
-* Setup logging
+* Setup logging 
 * Define API conventions
 
 Architecture:
