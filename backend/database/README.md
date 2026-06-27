@@ -29,3 +29,4 @@ prefer composite uniqueness
 4. profiles
 5. departments
 6. employees
+7. sessions
