@@ -24,3 +24,5 @@ prefer composite uniqueness
 # Current Tables
 
 1. organizations
+2. roles
+3. users
