@@ -26,3 +26,5 @@ prefer composite uniqueness
 1. organizations
 2. roles
 3. users
+4. profiles
+5. departments
