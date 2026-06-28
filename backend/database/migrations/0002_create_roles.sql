@@ -4,6 +4,7 @@ CREATE TABLE roles (
     name VARCHAR(100) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
     CONSTRAINT fk_roles_organization
         FOREIGN KEY (organization_id)
         REFERENCES organizations (id)
