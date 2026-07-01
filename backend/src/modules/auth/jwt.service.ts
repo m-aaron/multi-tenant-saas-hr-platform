@@ -1,7 +1,7 @@
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
 import { env } from '#config/env.js';
-import type { JwtPayload } from './auth.type.js';
+import type { JwtPayload } from './types/auth.type.js';
 
 type ExpiresIn = NonNullable<SignOptions['expiresIn']>;
 
