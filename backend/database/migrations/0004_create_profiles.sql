@@ -3,7 +3,6 @@ CREATE TABLE profiles (
 
     user_id UUID NOT NULL UNIQUE,
 
-    display_name VARCHAR(150) NOT NULL,
     avatar_url TEXT,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

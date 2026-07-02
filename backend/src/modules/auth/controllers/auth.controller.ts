@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import { registerUser } from '#modules/auth/services/auth.service.js';
+import { registerOrganization } from '#modules/auth/services/auth.service.js';
 
 export async function register(req: Request, res: Response): Promise<void> {
-    await registerUser(req.body);
+    await registerOrganization(req.body);
     res.status(201).json({ message: 'Organization registered successfully' });
 }

@@ -1,6 +1,7 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY,
 
+    employee_id UUID NOT NULL UNIQUE,
     organization_id UUID NOT NULL,
     role_id UUID NOT NULL,
 
@@ -12,6 +13,11 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
+
+    CONSTRAINT fk_users_employee
+        FOREIGN KEY (employee_id)
+        REFERENCES employees(id)
+        ON DELETE RESTRICT,
 
     CONSTRAINT fk_users_organization
         FOREIGN KEY (organization_id)
