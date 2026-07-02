@@ -31,6 +31,10 @@
     "#shared/*.js": {
       "@dev": "./src/shared/*.ts",
       "default": "./dist/shared/*.js"
+    },
+    "#database/*.js": {
+      "@dev": "./src/database/*.ts",
+      "default": "./dist/database/*.js"
     }
   },
   "dependencies": {

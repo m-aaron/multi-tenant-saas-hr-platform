@@ -22,9 +22,9 @@ function buildOptions(expiresIn?: string): SignOptions {
 export function signAccessToken(payload: JwtPayload): string {
     return jwt.sign(
         payload,
-        env.accessTokenSecret,
+        env.jwt.accessTokenSecret,
         buildOptions(
-            env.accessTokenExpires,
+            env.jwt.accessTokenExpires,
         ),
     );
 }
@@ -32,9 +32,9 @@ export function signAccessToken(payload: JwtPayload): string {
 export function signRefreshToken(payload: JwtPayload): string {
     return jwt.sign(
         payload,
-        env.refreshTokenSecret,
+        env.jwt.refreshTokenSecret,
         buildOptions(
-            env.refreshTokenExpires,
+            env.jwt.refreshTokenExpires,
         ),
     );
 }
@@ -42,13 +42,13 @@ export function signRefreshToken(payload: JwtPayload): string {
 export function verifyAccessToken(token: string): JwtPayload {
     return jwt.verify(
         token,
-        env.accessTokenSecret,
+        env.jwt.accessTokenSecret,
     ) as JwtPayload;
 }
 
 export function verifyRefreshToken(token: string): JwtPayload {
     return jwt.verify(
         token,
-        env.refreshTokenSecret,
+        env.jwt.refreshTokenSecret,
     ) as JwtPayload;
 }

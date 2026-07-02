@@ -1,10 +1,10 @@
 import { hashPassword } from '#shared/security/password.js';
-import { transaction } from '#shared/database/transaction.js';
+import { transaction } from '#database/transaction.js';
 import { 
     createOrganization,
     getOwnerRoleId,
     createUser,
-    createProfile,
+    createProfile
 } from '../repositories/auth.repository.js';
 import type { RegisterInput } from '../types/auth.type.js';
 

@@ -3,6 +3,11 @@ export interface LoginInput {
     password: string;
 }
 
+export interface LoginResponse {
+    accessToken: string;
+    refreshToken: string;
+}
+
 export interface RegisterInput extends LoginInput {
     organizationName: string;
     organizationSlug: string;

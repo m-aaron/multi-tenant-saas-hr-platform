@@ -1,4 +1,5 @@
-import database from '#config/database.js';
+import { db } from '#database/index.js';
+import { env } from '#config/env.js';
 
 
 // Health check response interface
@@ -13,7 +14,7 @@ export interface HealthCheckResponse {
 async function checkDatabaseConnection(): Promise<boolean> {
     try {
         // Simple query to verify connection - uses pool timeout
-        const result = await database.query('SELECT 1');
+        const result = await db.query('SELECT 1');
         return result.rows.length > 0;
     } catch (error) {
         console.error('[HealthCheck] Database connection failed:', error instanceof Error ? error.message : error);
@@ -29,7 +30,7 @@ async function checkDatabaseConnection(): Promise<boolean> {
 export async function performHealthCheck(): Promise<HealthCheckResponse> {
     const isDbConnected = await checkDatabaseConnection();
     const uptimeMs = Math.floor(process.uptime());
-    const environment = process.env['NODE_ENV'] ?? 'development';
+    const environment = env.NODE_ENV ?? 'development';
 
     return {
         status: isDbConnected ? 'ok' : 'unhealthy',
