@@ -4,7 +4,7 @@ import { db } from '#database/index.js';
 
 
 export async function withTransaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
-    const client = await db.connect();
+    const client: PoolClient = await db.connect();
     try {
         await client.query('BEGIN');
 
