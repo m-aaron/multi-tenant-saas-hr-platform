@@ -1,5 +1,5 @@
 import { withTransaction } from '#database/transaction.js';
-import { createOrganization, seedDefaultRoles } from '#modules/auth/repositories/auth.repository.js';
+import { createOrganization, seedDefaultRoles, findRoleByName } from '#modules/auth/repositories/auth.repository.js';
 import type { RegisterOrganizationInput } from '../types/auth.type.js';
 
 
@@ -11,8 +11,13 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
             name: input.organizationName,
             slug: input.organizationSlug,
         });
-        
+
         await seedDefaultRoles(client, organizationId);
+
+        const ownerRoleId = await findRoleByName(client, organizationId, 'Owner');
+
+        console.log(`Organization created with ID: ${organizationId}`);
+        console.log(`Owner role ID: ${ownerRoleId}`);
 
     });
 }

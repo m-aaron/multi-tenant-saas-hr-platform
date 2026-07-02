@@ -7,6 +7,7 @@ import type {
     CreateUserInput, 
     CreateProfileInput 
 } from '../types/repository.type.js';
+import type { RoleRow } from '#modules/role/types/database.type.js';
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
 
 
@@ -51,20 +52,32 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
 }
 
 export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
-        console.log('Finding owner role', organizationId,);
-        return generateUuid();
+        
+    const result = await client.query<RoleRow>(
+        `SELECT id 
+        FROM roles 
+        WHERE organization_id = $1 AND name = $2
+        LIMIT 1`,
+        [organizationId, roleName]
+    );
+
+    if (result.rowCount === 0 || !result.rows[0]) {
+        throw new Error(`Role ${roleName} not found.`);
+    }
+    
+    return result.rows[0].id;
 }
 
-export async function createEmployee(client: PoolClient, input: CreateEmployeeInput): Promise<string> {
+export async function createEmployee(_client: PoolClient, input: CreateEmployeeInput): Promise<string> {
         console.log('Creating employee', input);
         return generateUuid();
 }
 
-export async function createUser(client: PoolClient, input: CreateUserInput): Promise<string> {
+export async function createUser(_client: PoolClient, input: CreateUserInput): Promise<string> {
         console.log('Creating user', input);
         return generateUuid();
 }
 
-export async function createProfile(client: PoolClient, input: CreateProfileInput): Promise<void> {
+export async function createProfile(_client: PoolClient, input: CreateProfileInput): Promise<void> {
         console.log('Creating profile', input);
 }
