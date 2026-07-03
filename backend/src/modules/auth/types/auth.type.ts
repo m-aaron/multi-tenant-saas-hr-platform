@@ -3,9 +3,9 @@ export interface RegisterOrganizationInput {
     organizationSlug: string;
 
     firstName: string;
-    middleName?: string;
+    middleName: string | null;
     lastName: string;
-    nameExtension?: string;
+    nameExtension: string | null;
 
     ownerEmail: string;
     password: string;

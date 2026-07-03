@@ -54,7 +54,10 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
 export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
         
     const result = await client.query<RoleRow>(
-        `SELECT id 
+        `SELECT 
+            id, 
+            organization_id, 
+            name
         FROM roles 
         WHERE organization_id = $1 AND name = $2
         LIMIT 1`,
@@ -64,13 +67,46 @@ export async function findRoleByName(client: PoolClient, organizationId: string,
     if (result.rowCount === 0 || !result.rows[0]) {
         throw new Error(`Role ${roleName} not found.`);
     }
-    
+
     return result.rows[0].id;
 }
 
-export async function createEmployee(_client: PoolClient, input: CreateEmployeeInput): Promise<string> {
-        console.log('Creating employee', input);
-        return generateUuid();
+export async function createEmployee(client: PoolClient, input: CreateEmployeeInput): Promise<string> {
+    
+    const employeeId = generateUuid();
+
+    const query = `
+        INSERT INTO employees (
+            id, 
+            organization_id, 
+            employee_number, 
+            first_name, 
+            middle_name, 
+            last_name, 
+            name_extension, 
+            job_title, 
+            employment_status, 
+            hire_date
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `;
+
+    const values = [
+        employeeId,
+        input.organizationId,
+        input.employeeNumber,
+        input.firstName,
+        input.middleName ?? null,
+        input.lastName,
+        input.nameExtension ?? null,
+        input.jobTitle,
+        input.employmentStatus,
+        input.hireDate
+    ];
+
+    await client.query(query, values);
+
+    return employeeId;
 }
 
 export async function createUser(_client: PoolClient, input: CreateUserInput): Promise<string> {

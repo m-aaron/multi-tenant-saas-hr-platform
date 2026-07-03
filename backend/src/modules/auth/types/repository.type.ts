@@ -11,9 +11,9 @@ export interface CreateEmployeeInput {
     employeeNumber: string;
 
     firstName: string;
-    middleName?: string;
+    middleName: string | null;
     lastName: string;
-    nameExtension?: string;
+    nameExtension: string | null;
 
     jobTitle: string;
 
