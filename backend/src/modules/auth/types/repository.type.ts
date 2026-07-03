@@ -11,9 +11,9 @@ export interface CreateEmployeeInput {
     employeeNumber: string;
 
     firstName: string;
-    middleName: string | null;
+    middleName?: string | undefined;
     lastName: string;
-    nameExtension: string | null;
+    nameExtension?: string | undefined;
 
     jobTitle: string;
 
@@ -33,5 +33,4 @@ export interface CreateUserInput {
 
 export interface CreateProfileInput {
     userId: string;
-    avatarUrl?: string;
 }

@@ -3,22 +3,12 @@ export interface RegisterOrganizationInput {
     organizationSlug: string;
 
     firstName: string;
-    middleName: string | null;
+    middleName?: string | undefined;
     lastName: string;
-    nameExtension: string | null;
+    nameExtension?: string;
 
     ownerEmail: string;
     password: string;
-}
-
-export interface LoginInput {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
 }
 
 export interface JwtPayload {

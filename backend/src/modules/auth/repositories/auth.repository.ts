@@ -139,6 +139,22 @@ export async function createUser(client: PoolClient, input: CreateUserInput): Pr
     return userId;
 }
 
-export async function createProfile(_client: PoolClient, input: CreateProfileInput): Promise<void> {
-        console.log('Creating profile', input);
+export async function createProfile(client: PoolClient, input: CreateProfileInput): Promise<void> {
+    
+    const profileId = generateUuid();
+
+    const query = `
+        INSERT INTO profiles (
+            id, 
+            user_id
+        ) 
+        VALUES ($1, $2)
+    `;
+
+    const values = [
+        profileId,
+        input.userId
+    ];
+
+    await client.query(query, values);
 }

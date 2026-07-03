@@ -5,6 +5,7 @@ import {
     findRoleByName, 
     createEmployee,
     createUser,
+    createProfile
 } from '#modules/auth/repositories/auth.repository.js';
 import type { RegisterOrganizationInput } from '../types/auth.type.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
@@ -43,12 +44,16 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
 
         const passwordHash = await hashPassword(input.password);
 
-        await createUser(client, {
+        const userId = await createUser(client, {
             employeeId,
             organizationId,
             roleId: ownerRoleId,
             email: input.ownerEmail,
             passwordHash
+        });
+
+        await createProfile(client, {
+            userId
         });
 
     });
