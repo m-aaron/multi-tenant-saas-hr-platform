@@ -3,13 +3,16 @@ import {
     createOrganization, 
     seedDefaultRoles, 
     findRoleByName, 
-    createEmployee 
+    createEmployee,
+    createUser,
 } from '#modules/auth/repositories/auth.repository.js';
 import type { RegisterOrganizationInput } from '../types/auth.type.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
 import { 
     OWNER_EMPLOYEE_DEFAULTS
 } from '#modules/employee/constants/default.js';
+import { hashPassword } from '#shared/security/password.js';
+import { today } from '#shared/utils/date.js';
 
 
 export async function registerOrganization(input: RegisterOrganizationInput): Promise<void> {
@@ -22,11 +25,11 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
         });
 
         await seedDefaultRoles(client, organizationId);
-        await findRoleByName(client, organizationId, OWNER_EMPLOYEE_DEFAULTS.jobTitle);
 
+        const ownerRoleId = await findRoleByName(client, organizationId, OWNER_EMPLOYEE_DEFAULTS.jobTitle);
         const employeeNumber = await generateEmployeeNumber(client, organizationId);
 
-        await createEmployee(client, {
+        const employeeId = await createEmployee(client, {
             organizationId,
             employeeNumber,
             firstName: input.firstName,
@@ -35,7 +38,17 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
             nameExtension: input.nameExtension,
             jobTitle: OWNER_EMPLOYEE_DEFAULTS.jobTitle,
             employmentStatus: OWNER_EMPLOYEE_DEFAULTS.employmentStatus,
-            hireDate: new Date().toISOString().slice(0, 10) // Format as YYYY-MM-DD
+            hireDate: today()
+        });
+
+        const passwordHash = await hashPassword(input.password);
+
+        await createUser(client, {
+            employeeId,
+            organizationId,
+            roleId: ownerRoleId,
+            email: input.ownerEmail,
+            passwordHash
         });
 
     });

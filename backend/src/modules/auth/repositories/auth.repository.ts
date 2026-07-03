@@ -109,9 +109,34 @@ export async function createEmployee(client: PoolClient, input: CreateEmployeeIn
     return employeeId;
 }
 
-export async function createUser(_client: PoolClient, input: CreateUserInput): Promise<string> {
-        console.log('Creating user', input);
-        return generateUuid();
+export async function createUser(client: PoolClient, input: CreateUserInput): Promise<string> {
+    
+    const userId = generateUuid();
+
+    const query = `
+        INSERT INTO users (
+            id, 
+            employee_id, 
+            organization_id, 
+            role_id, 
+            email, 
+            password_hash
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+
+    const values = [
+        userId,
+        input.employeeId,
+        input.organizationId,
+        input.roleId,
+        input.email,
+        input.passwordHash
+    ];
+
+    await client.query(query, values);
+
+    return userId;
 }
 
 export async function createProfile(_client: PoolClient, input: CreateProfileInput): Promise<void> {
