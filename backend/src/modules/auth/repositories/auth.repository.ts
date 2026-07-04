@@ -9,6 +9,7 @@ import type {
 } from '../types/repository.type.js';
 import type { RoleRow } from '#modules/role/types/database.type.js';
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
+import { NotFoundError } from '#shared/errors/not-found-error.js';
 
 
 export async function createOrganization(client: PoolClient, input: CreateOrganizationInput): Promise<string> {
@@ -52,7 +53,7 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
 }
 
 export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
-        
+
     const result = await client.query<RoleRow>(
         `SELECT 
             id, 
@@ -65,7 +66,7 @@ export async function findRoleByName(client: PoolClient, organizationId: string,
     );
 
     if (result.rowCount === 0 || !result.rows[0]) {
-        throw new Error(`Role ${roleName} not found.`);
+        throw new NotFoundError('Owner role not found.');
     }
 
     return result.rows[0].id;

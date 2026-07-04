@@ -22,7 +22,7 @@ export const validate = ( schema: ValidationConfig ): RequestHandler => async ( 
         next();
     } catch (error) {
         if (error instanceof ZodError) {
-            next(new AppError('Validation failed', 400, 'VALIDATION_ERROR'));
+            next(new AppError('Validation failed', 400));
 
             return;
         }
