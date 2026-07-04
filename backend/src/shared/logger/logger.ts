@@ -14,6 +14,4 @@ if (isDevelopment) {
     };
 }
 
-const logger = pino(options);
-
-export default logger;
+export const logger = pino(options);
