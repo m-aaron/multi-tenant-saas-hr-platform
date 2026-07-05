@@ -54,4 +54,4 @@ export const registerOrganizationSchema = z.object({
 });
 
 
-export type RegisterOrganizationSchema = z.infer<typeof registerOrganizationSchema>;
+export type RegisterOrganizationInput = z.infer<typeof registerOrganizationSchema>;

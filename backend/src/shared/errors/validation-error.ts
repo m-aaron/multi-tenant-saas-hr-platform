@@ -1,9 +1,17 @@
 import { AppError } from './app-error.js';
+import type { FieldValidationError } from '../types/validation-error.type.js'
 
 
 export class ValidationError extends AppError {
 
-    constructor(message = 'Validation failed.') {
+    public readonly errors: FieldValidationError[];
+
+    constructor(
+        message = 'Validation failed.',
+        errors: FieldValidationError[] = []
+    ) {
         super(message, 400);
+
+        this.errors = errors;
     }
 }

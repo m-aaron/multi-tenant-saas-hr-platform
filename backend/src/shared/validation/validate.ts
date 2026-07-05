@@ -12,7 +12,20 @@ export function validate(schema: ZodType): RequestHandler {
             next();
         } catch (error) {
             if (error instanceof ZodError) {
-                throw new ValidationError(error.issues[0]?.message ?? 'Validation failed.');
+
+                const validationIssues = error.issues.map((issue) => ({
+                    field: issue.path.join('.'),
+                    message: issue.message,
+                }));
+
+                next(
+                    new ValidationError(
+                        'Validation failed.',
+                        validationIssues
+                    )
+                );
+
+                return;
             }
 
             next(error);
