@@ -1,32 +1,21 @@
-import { type RequestHandler } from 'express';
-import { ZodError } from 'zod';
+import type { RequestHandler } from 'express';
 
-import { AppError } from '#shared/errors/app-error.js';
-import type { ValidationConfig } from './validation.type.js';
+import { ZodError, type ZodType } from 'zod';
 
+import { ValidationError } from '#shared/errors/validation-error.js';
 
-export const validate = ( schema: ValidationConfig ): RequestHandler => async ( req, _res, next ) => {
-    try {
-        if (schema.body) {
-            req.body = await schema.body.parseAsync(req.body);
+export function validate(schema: ZodType): RequestHandler {
+    return (request, _response, next) => {
+        try {
+            request.body = schema.parse(request.body);
+
+            next();
+        } catch (error) {
+            if (error instanceof ZodError) {
+                throw new ValidationError(error.issues[0]?.message ?? 'Validation failed.');
+            }
+
+            next(error);
         }
-
-        if (schema.query) {
-            req.query = await schema.query.parseAsync(req.query);
-        }
-
-        if (schema.params) {
-            req.params = await schema.params.parseAsync(req.params);
-        }
-
-        next();
-    } catch (error) {
-        if (error instanceof ZodError) {
-            next(new AppError('Validation failed', 400));
-
-            return;
-        }
-
-        next(error);
-    }
-};
+    };
+}
