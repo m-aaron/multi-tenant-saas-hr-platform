@@ -1,14 +1,18 @@
 import type { PoolClient } from 'pg';
 
 import { generateUuid } from '#shared/utils/uuid.js';
+
 import type { 
     CreateOrganizationInput, 
     CreateEmployeeInput, 
     CreateUserInput, 
-    CreateProfileInput 
-} from '../types/repository.type.js';
-import type { RoleRow } from '#modules/role/types/database.type.js';
+    CreateProfileInput,
+    FindLoginUserInput,
+    UserLoginRow
+} from '../types/auth.type.js';
+
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
+
 import { NotFoundError } from '#shared/errors/not-found-error.js';
 
 
@@ -54,7 +58,7 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
 
 export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
 
-    const result = await client.query<RoleRow>(
+    const result = await client.query(
         `SELECT 
             id, 
             organization_id, 
@@ -158,4 +162,45 @@ export async function createProfile(client: PoolClient, input: CreateProfileInpu
     ];
 
     await client.query(query, values);
+}
+
+export async function findUserForLogin(client: PoolClient, input: FindLoginUserInput): Promise<UserLoginRow | null> {
+
+    const query = `
+        SELECT
+            u.id,
+            u.employee_id,
+            u.organization_id,
+            u.role_id,
+            u.email,
+            u.password_hash,
+            u.status
+        FROM users u
+        INNER JOIN organizations o
+            ON o.id = u.organization_id
+        WHERE
+            o.slug = $1
+            AND u.email = $2
+        LIMIT 1;
+    `;
+
+    const values = [input.organizationSlug, input.email];
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const userRow = result.rows[0];
+
+    return {
+        id: userRow.id,
+        employeeId: userRow.employee_id,
+        organizationId: userRow.organization_id,
+        roleId: userRow.role_id,
+        email: userRow.email,
+        passwordHash: userRow.password_hash,
+        status: userRow.status
+    };
 }

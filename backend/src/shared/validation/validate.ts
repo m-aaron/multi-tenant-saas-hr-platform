@@ -18,12 +18,7 @@ export function validate(schema: ZodType): RequestHandler {
                     message: issue.message,
                 }));
 
-                next(
-                    new ValidationError(
-                        'Validation failed.',
-                        validationIssues
-                    )
-                );
+                next(new ValidationError('Validation failed.', validationIssues));
 
                 return;
             }

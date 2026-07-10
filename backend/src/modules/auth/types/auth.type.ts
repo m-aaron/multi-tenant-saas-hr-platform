@@ -1,18 +1,75 @@
-export interface RegisterOrganizationInput {
-    organizationName: string;
-    organizationSlug: string;
+import type { EmploymentStatus } from "../constants/auth.constant.js";
+export interface CreateOrganizationInput {
+    name: string;
+    slug: string;
+}
+
+export interface CreateEmployeeInput {
+    organizationId: string;
+
+    employeeNumber: string;
 
     firstName: string;
     middleName?: string | undefined;
     lastName: string;
-    nameExtension?: string;
+    nameExtension?: string | undefined;
 
-    ownerEmail: string;
-    password: string;
+    jobTitle: string;
+
+    employmentStatus: EmploymentStatus;
+
+    hireDate: string;
+}
+
+export interface CreateUserInput {
+    employeeId: string;
+    organizationId: string;
+    roleId: string;
+
+    email: string;
+    passwordHash: string;
+}
+
+export interface CreateProfileInput {
+    userId: string;
+}
+
+export interface FindLoginUserInput {
+    organizationSlug: string;
+    email: string;
+}
+
+export interface UserLoginRow {
+    id: string,
+    employeeId: string,
+    organizationId: string,
+    roleId: string,
+    email: string,
+    passwordHash: string,
+    status: string
+}
+
+export interface LoginResult {
+
+    user: {
+        id: string;
+        organizationId: string;
+        employeeId: string | null;
+        roleId: string;
+        email: string;
+    };
+
+    tokens: TokenPair;
+
 }
 
 export interface JwtPayload {
     sub: string; // userId
     organizationId: string;
     roleId: string;
+}
+
+export interface TokenPair {
+    accessToken: string;
+    refreshToken: string;
 }
