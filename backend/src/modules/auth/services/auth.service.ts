@@ -10,8 +10,6 @@ import {
     findUserForLogin
 } from '#modules/auth/repositories/auth.repository.js';
 
-import type { JwtPayload } from '../types/auth.type.js';
-
 import type { RegisterOrganizationInput } from '../schemas/auth.schema.js'
 import type { LoginInput } from '../schemas/login.schema.js';
 
@@ -23,6 +21,7 @@ import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/default.js'
 
 import { hashPassword, verifyPassword } from '#shared/security/password.js';
 import { today } from '#shared/utils/date.js';
+import { generateUuid } from '#shared/utils/uuid.js';
 
 import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 import { ForbiddenError } from '#shared/errors/forbidden-error.js';
@@ -108,15 +107,16 @@ export async function login(input: LoginInput): Promise<LoginResult> {
             throw new ForbiddenError('User account is not active.');
         }
 
-        const payload: JwtPayload = {
+        const session = await issueSession({
             sub: userId,
             organizationId: organizationId,
             roleId: roleId
-        }
+        });
 
-        const session = await issueSession(payload);
+        const sessionId = generateUuid();
 
         await createSession(client, {
+            id: sessionId,
             organizationId,
             userId,
             refreshTokenHash: session.refreshTokenHash,

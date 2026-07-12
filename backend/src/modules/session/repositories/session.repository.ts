@@ -1,12 +1,8 @@
 import { type PoolClient } from "pg";
 
-import { generateUuid } from "#shared/utils/uuid.js";
-
 import type { CreateSessionInput } from "../types/session.type.js";
 
-export async function createSession(client: PoolClient, input: CreateSessionInput): Promise<string> {
-    
-    const sessionId = generateUuid();
+export async function createSession(client: PoolClient, input: CreateSessionInput): Promise<void> {
 
     const query = `
         INSERT INTO sessions (
@@ -20,7 +16,7 @@ export async function createSession(client: PoolClient, input: CreateSessionInpu
     `;
 
     const values = [
-        sessionId,
+        input.id,
         input.organizationId,
         input.userId,
         input.refreshTokenHash,
@@ -28,6 +24,4 @@ export async function createSession(client: PoolClient, input: CreateSessionInpu
     ]
 
     await client.query(query, values);
-
-    return sessionId;
 }
