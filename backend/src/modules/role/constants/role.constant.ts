@@ -1,9 +1,9 @@
 export const DEFAULT_ROLES = [
-    'Owner',
-    'Administrator',
-    'HR Manager',
-    'Department Head',
-    'Employee',
+    'owner',
+    'administrator',
+    'hr_manager',
+    'department_head',
+    'employee'
 ] as const;
 
 export type RoleName = typeof DEFAULT_ROLES[number];

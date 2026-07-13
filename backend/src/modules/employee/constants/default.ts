@@ -1,4 +1,4 @@
 export const OWNER_EMPLOYEE_DEFAULTS = {
-    jobTitle: 'Owner',
+    jobTitle: 'owner',
     employmentStatus: 'regular',
 } as const;

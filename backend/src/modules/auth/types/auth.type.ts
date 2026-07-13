@@ -1,5 +1,6 @@
 import type { EmploymentStatus } from "../constants/auth.constant.js";
 import type { UserStatus } from "#modules/user/constants/user.constant.js";
+import type { RoleName } from "#modules/role/constants/role.constant.js";
 export interface CreateOrganizationInput {
     name: string;
     slug: string;
@@ -82,7 +83,7 @@ export interface AuthenticatedUserRecord {
     organizationDeletedAt: Date | null
     employeeId: string;
     roleId: string;
-    roleName: string;
+    roleName: RoleName;
     email: string;
     status: UserStatus;
     userDeletedAt: Date | null;
