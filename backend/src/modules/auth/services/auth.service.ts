@@ -8,7 +8,8 @@ import {
     createUser,
     createProfile,
     findUserForLogin,
-    revokeSession
+    revokeSession,
+    revokeAllSessions
 } from '#modules/auth/repositories/auth.repository.js';
 
 import type { RegisterOrganizationInput } from '../schemas/registration.schema.js'
@@ -230,10 +231,22 @@ export async function logout(refreshToken: string): Promise<void> {
             throw new UnauthorizedError('Session has expired.');
         }
 
-        await revokeSession(client, {
-            sessionId: session.id,
-            revokedAt: new Date()
-        });
+        await revokeSession(client, session.id);
 
+    });
+}
+
+
+export async function logoutAllSessions(refreshToken: string): Promise<void> {
+    
+    await withTransaction(async (client) => {
+        
+        const payload = verifyRefreshToken(refreshToken);
+
+        if (!payload) {
+            throw new UnauthorizedError('Invalid refresh token.');
+        }
+
+        await revokeAllSessions(client, payload.sub);
     });
 }

@@ -74,8 +74,3 @@ export interface TokenPair {
     accessToken: string;
     refreshToken: string;
 }
-
-export interface RevokeSessionInput {
-    sessionId: string;
-    revokedAt: Date;
-}

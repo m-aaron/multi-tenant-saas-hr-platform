@@ -8,8 +8,7 @@ import type {
     CreateUserInput, 
     CreateProfileInput,
     FindLoginUserInput,
-    UserLoginRow,
-    RevokeSessionInput
+    UserLoginRow
 } from '../types/auth.type.js';
 
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
@@ -206,19 +205,28 @@ export async function findUserForLogin(client: PoolClient, input: FindLoginUserI
     };
 }
 
-export async function revokeSession(client: PoolClient, input: RevokeSessionInput): Promise<void> {
+export async function revokeSession(client: PoolClient, sessionId: string): Promise<void> {
     
     const query = `
         UPDATE sessions
         SET 
-            revoked_at = $1
-        WHERE id = $2
+            revoked_at = NOW()
+        WHERE id = $1 AND revoked_at IS NULL
     `;
 
-    const values = [
-        input.revokedAt, 
-        input.sessionId
-    ];
+    await client.query(query, [sessionId]);
+}
 
-    await client.query(query, values);
+export async function revokeAllSessions(client: PoolClient, userId: string): Promise<number | null> {
+    
+    const query = `
+        UPDATE sessions
+        SET 
+            revoked_at = NOW()
+        WHERE user_id = $1 AND revoked_at IS NULL
+    `;
+
+    const result = await client.query(query, [userId]);
+
+    return result.rowCount; // Return the number of sessions revoked
 }
