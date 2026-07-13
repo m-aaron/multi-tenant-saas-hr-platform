@@ -241,11 +241,13 @@ export async function findAuthenticatedUserById(client: PoolClient, userId: stri
             o.deleted_at AS organization_deleted_at,
             u.employee_id,
             u.role_id,
+            r.name AS role_name,
             u.email,
             u.status,
             u.deleted_at AS user_deleted_at
         FROM users u
         INNER JOIN organizations o ON u.organization_id = o.id
+        INNER JOIN roles r ON u.role_id = r.id
         WHERE u.id = $1
         LIMIT 1;
     `;
@@ -261,11 +263,12 @@ export async function findAuthenticatedUserById(client: PoolClient, userId: stri
     return {    
         id: userRow.id,
         organizationId: userRow.organization_id,
-        organizationDeletedAt: userRow.organization_deleted_at,
+        organizationDeletedAt: userRow.organization_deleted_at ? new Date(userRow.organization_deleted_at) : null,
         employeeId: userRow.employee_id,
         roleId: userRow.role_id,
+        roleName: userRow.role_name,
         email: userRow.email,
         status: userRow.status,
-        userDeletedAt: userRow.user_deleted_at
+        userDeletedAt: userRow.user_deleted_at ? new Date(userRow.user_deleted_at) : null
     };
 }

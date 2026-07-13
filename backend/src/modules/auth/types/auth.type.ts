@@ -82,6 +82,7 @@ export interface AuthenticatedUserRecord {
     organizationDeletedAt: Date | null
     employeeId: string;
     roleId: string;
+    roleName: string;
     email: string;
     status: UserStatus;
     userDeletedAt: Date | null;

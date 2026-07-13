@@ -3,6 +3,7 @@ export interface AuthenticatedUser {
     organizationId: string;
     employeeId: string;
     roleId: string;
+    roleName: string;
     email: string;
     status: string;
 }

@@ -61,6 +61,7 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
             organizationId: user.organizationId,
             employeeId: user.employeeId,
             roleId: user.roleId,
+            roleName: user.roleName,
             email: user.email,
             status: user.status
         };
