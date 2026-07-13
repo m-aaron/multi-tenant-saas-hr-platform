@@ -10,24 +10,29 @@ import {
     findUserForLogin
 } from '#modules/auth/repositories/auth.repository.js';
 
-import type { RegisterOrganizationInput } from '../schemas/auth.schema.js'
+import type { RegisterOrganizationInput } from '../schemas/registration.schema.js'
 import type { LoginInput } from '../schemas/login.schema.js';
 
-import type { LoginResult } from '../types/auth.type.js';
-
-import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
+import type { LoginResult, TokenPair } from '../types/auth.type.js';
 
 import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/default.js';
 
 import { hashPassword, verifyPassword } from '#shared/security/password.js';
 import { today } from '#shared/utils/date.js';
 import { generateUuid } from '#shared/utils/uuid.js';
+import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
+import { verifyRefreshToken } from '../jwt.service.js';
+import { compareRefreshTokenHash } from '../utils/session.util.js';
 
 import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 import { ForbiddenError } from '#shared/errors/forbidden-error.js';
 
 import { issueSession } from '#modules/session/services/session.service.js';
-import { createSession } from '#modules/session/repositories/session.repository.js';
+import { 
+    createSession, 
+    findSessionById,
+    updateSessionRefreshToken
+} from '#modules/session/repositories/session.repository.js';
 
 
 export async function registerOrganization(input: RegisterOrganizationInput): Promise<void> {
@@ -107,13 +112,14 @@ export async function login(input: LoginInput): Promise<LoginResult> {
             throw new ForbiddenError('User account is not active.');
         }
 
+        const sessionId = generateUuid();
+
         const session = await issueSession({
+            sid: sessionId,
             sub: userId,
             organizationId: organizationId,
             roleId: roleId
         });
-
-        const sessionId = generateUuid();
 
         await createSession(client, {
             id: sessionId,
@@ -133,6 +139,66 @@ export async function login(input: LoginInput): Promise<LoginResult> {
             },
             tokens: session.tokens
         };
+    });
+
+    return result;
+}
+
+
+export async function refresh(refreshToken: string): Promise<TokenPair> {
+
+    const result = await withTransaction(async (client) => {
+
+        const payload = verifyRefreshToken(refreshToken);
+
+        if (!payload) {
+            throw new UnauthorizedError('Invalid refresh token.');
+        }
+
+        const session = await findSessionById(client, payload.sid);
+
+        if (!session) {
+            throw new UnauthorizedError('Session not found.');
+        }
+
+        const { 
+            id, 
+            organizationId, 
+            userId, 
+            refreshTokenHash, 
+            expiresAt, 
+            revokedAt 
+        } = session;
+
+        if (revokedAt) {
+            throw new UnauthorizedError('Session has been revoked.');
+        }
+
+        if (expiresAt < new Date()) {
+            throw new UnauthorizedError('Session has expired.');
+        }
+
+        const refreshTokenMatches = await compareRefreshTokenHash(refreshTokenHash, refreshToken);
+
+        if (!refreshTokenMatches) {
+            throw new UnauthorizedError('Invalid refresh token.');
+        }
+
+        const updatedSession =  await issueSession({
+            sid: id,
+            sub: userId,
+            organizationId: organizationId,
+            roleId: payload.roleId
+        });
+
+        await updateSessionRefreshToken(client, {
+            sessionId: id,
+            refreshTokenHash: updatedSession.refreshTokenHash,
+            expiresAt: updatedSession.expiresAt,
+            lastUsedAt: new Date()
+        });
+
+        return updatedSession.tokens;
     });
 
     return result;

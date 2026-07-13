@@ -64,6 +64,7 @@ export interface LoginResult {
 }
 
 export interface JwtPayload {
+    sid: string; // sessionId
     sub: string; // userId
     organizationId: string;
     roleId: string;
