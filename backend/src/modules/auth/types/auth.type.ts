@@ -1,4 +1,5 @@
 import type { EmploymentStatus } from "../constants/auth.constant.js";
+import type { UserStatus } from "#modules/user/constants/user.constant.js";
 export interface CreateOrganizationInput {
     name: string;
     slug: string;
@@ -46,7 +47,7 @@ export interface UserLoginRow {
     roleId: string,
     email: string,
     passwordHash: string,
-    status: string
+    status: UserStatus
 }
 
 export interface LoginResult {
@@ -73,4 +74,15 @@ export interface JwtPayload {
 export interface TokenPair {
     accessToken: string;
     refreshToken: string;
+}
+
+export interface AuthenticatedUserRecord {
+    id: string;
+    organizationId: string;
+    organizationDeletedAt: Date | null
+    employeeId: string;
+    roleId: string;
+    email: string;
+    status: UserStatus;
+    userDeletedAt: Date | null;
 }
