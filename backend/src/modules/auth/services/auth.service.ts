@@ -7,7 +7,8 @@ import {
     createEmployee,
     createUser,
     createProfile,
-    findUserForLogin
+    findUserForLogin,
+    revokeSession
 } from '#modules/auth/repositories/auth.repository.js';
 
 import type { RegisterOrganizationInput } from '../schemas/registration.schema.js'
@@ -202,4 +203,37 @@ export async function refresh(refreshToken: string): Promise<TokenPair> {
     });
 
     return result;
+}
+
+
+export async function logout(refreshToken: string): Promise<void> {
+    
+    await withTransaction(async (client) => {
+        
+        const payload = verifyRefreshToken(refreshToken);
+
+        if (!payload) {
+            throw new UnauthorizedError('Invalid refresh token.');
+        }
+
+        const session = await findSessionById(client, payload.sid);
+
+        if (!session) {
+            throw new UnauthorizedError('Session not found.');
+        }
+
+        if (session.revokedAt) {
+            throw new UnauthorizedError('Session has been revoked.');
+        }
+
+        if (session.expiresAt < new Date()) {
+            throw new UnauthorizedError('Session has expired.');
+        }
+
+        await revokeSession(client, {
+            sessionId: session.id,
+            revokedAt: new Date()
+        });
+
+    });
 }

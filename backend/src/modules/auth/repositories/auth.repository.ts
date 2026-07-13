@@ -8,7 +8,8 @@ import type {
     CreateUserInput, 
     CreateProfileInput,
     FindLoginUserInput,
-    UserLoginRow
+    UserLoginRow,
+    RevokeSessionInput
 } from '../types/auth.type.js';
 
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
@@ -203,4 +204,21 @@ export async function findUserForLogin(client: PoolClient, input: FindLoginUserI
         passwordHash: userRow.password_hash,
         status: userRow.status
     };
+}
+
+export async function revokeSession(client: PoolClient, input: RevokeSessionInput): Promise<void> {
+    
+    const query = `
+        UPDATE sessions
+        SET 
+            revoked_at = $1
+        WHERE id = $2
+    `;
+
+    const values = [
+        input.revokedAt, 
+        input.sessionId
+    ];
+
+    await client.query(query, values);
 }

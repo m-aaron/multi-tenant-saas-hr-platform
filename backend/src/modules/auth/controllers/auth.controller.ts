@@ -4,11 +4,13 @@ import { asyncHandler } from '#shared/utils/async-handler.js';
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { RegisterOrganizationInput } from '#modules/auth/schemas/registration.schema.js';
 import type { RefreshInput } from '#modules/auth/schemas/refresh.schema.js';
+import type { LogoutInput } from '../schemas/logout.schema.js';
 
 import { 
     registerOrganization as registerOrganizationService,
     login,
-    refresh
+    refresh,
+    logout as logoutService
 } from '#modules/auth/services/auth.service.js';
 
 
@@ -26,6 +28,7 @@ export const registerOrganization: RequestHandler = asyncHandler(async (request,
 
     response.status(201).json(responseBody);
 });
+
 
 export const loginUser: RequestHandler = asyncHandler(async (request, response) => {
 
@@ -53,6 +56,22 @@ export const refreshToken: RequestHandler = asyncHandler(async (request, respons
         success: true,
         message: 'Token refreshed successfully',
         data: result
+    }
+
+    response.status(200).json(responseBody);
+});
+
+
+export const logout: RequestHandler = asyncHandler(async (request, response) => {
+
+    const input: LogoutInput = request.body;
+
+    await logoutService(input.refreshToken);
+
+    const responseBody: ApiSuccessResponse<null> = {
+        success: true,
+        message: 'Logout successful',
+        data: null
     }
 
     response.status(200).json(responseBody);
