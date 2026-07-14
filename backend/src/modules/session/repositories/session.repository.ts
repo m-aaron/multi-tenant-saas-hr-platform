@@ -7,6 +7,8 @@ import type {
     UpdateSessionRefreshTokenInput
 } from "../types/session.type.js";
 
+
+// This function creates a new session in the database with the provided input data.
 export async function createSession(client: PoolClient, input: CreateSessionInput): Promise<void> {
 
     const query = `
@@ -31,6 +33,8 @@ export async function createSession(client: PoolClient, input: CreateSessionInpu
     await client.query(query, values);
 }
 
+
+// This function finds a session in the database by its unique identifier and returns its details.
 export async function findSessionById(client: PoolClient, sessionId: string): Promise<RefreshSession | null> {
 
     const query = `
@@ -65,6 +69,7 @@ export async function findSessionById(client: PoolClient, sessionId: string): Pr
 }
 
 
+// This function updates the refresh token for a specific session in the database.
 export async function updateSessionRefreshToken(client: PoolClient, input: UpdateSessionRefreshTokenInput): Promise<void> {
     
     const query = `

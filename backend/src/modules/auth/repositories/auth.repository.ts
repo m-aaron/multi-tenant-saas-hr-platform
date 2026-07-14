@@ -17,7 +17,9 @@ import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.const
 import { NotFoundError } from '#shared/errors/not-found-error.js';
 
 
+// This function creates a new organization in the database and returns its unique identifier.
 export async function createOrganization(client: PoolClient, input: CreateOrganizationInput): Promise<string> {
+    
     const organizationId = generateUuid();
 
     await client.query(
@@ -28,6 +30,8 @@ export async function createOrganization(client: PoolClient, input: CreateOrgani
     return organizationId;
 }
 
+
+// This function seeds default roles for a given organization in the database.
 export async function seedDefaultRoles(client: PoolClient, organizationId: string): Promise<void> {
     
     // Build the VALUES clause dynamically
@@ -57,6 +61,8 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
     await client.query(query, values);
 }
 
+
+// This function finds the ID of a role by its name within a specific organization.
 export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
 
     const result = await client.query(
@@ -77,6 +83,8 @@ export async function findRoleByName(client: PoolClient, organizationId: string,
     return result.rows[0].id;
 }
 
+
+// This function creates a new employee in the database and returns its unique identifier.
 export async function createEmployee(client: PoolClient, input: CreateEmployeeInput): Promise<string> {
     
     const employeeId = generateUuid();
@@ -115,6 +123,8 @@ export async function createEmployee(client: PoolClient, input: CreateEmployeeIn
     return employeeId;
 }
 
+
+// This function creates a new user in the database and returns its unique identifier.
 export async function createUser(client: PoolClient, input: CreateUserInput): Promise<string> {
     
     const userId = generateUuid();
@@ -145,6 +155,8 @@ export async function createUser(client: PoolClient, input: CreateUserInput): Pr
     return userId;
 }
 
+
+// This function creates a new profile in the database for a given user.
 export async function createProfile(client: PoolClient, input: CreateProfileInput): Promise<void> {
     
     const profileId = generateUuid();
@@ -165,6 +177,8 @@ export async function createProfile(client: PoolClient, input: CreateProfileInpu
     await client.query(query, values);
 }
 
+
+// This function finds a user in the database based on the provided organization slug and email.
 export async function findUserForLogin(client: PoolClient, input: FindLoginUserInput): Promise<UserLoginRow | null> {
 
     const query = `
@@ -206,6 +220,8 @@ export async function findUserForLogin(client: PoolClient, input: FindLoginUserI
     };
 }
 
+
+// This function revokes a specific session in the database by setting its revoked_at timestamp.
 export async function revokeSession(client: PoolClient, sessionId: string): Promise<void> {
     
     const query = `
@@ -218,6 +234,8 @@ export async function revokeSession(client: PoolClient, sessionId: string): Prom
     await client.query(query, [sessionId]);
 }
 
+
+// This function revokes all active sessions for a specific user in the database.
 export async function revokeAllSessions(client: PoolClient, userId: string): Promise<number | null> {
     
     const query = `
@@ -232,6 +250,8 @@ export async function revokeAllSessions(client: PoolClient, userId: string): Pro
     return result.rowCount; // Return the number of sessions revoked
 }
 
+
+// This function finds an authenticated user in the database by their unique identifier.
 export async function findAuthenticatedUserById(client: PoolClient, userId: string): Promise<AuthenticatedUserRecord | null> {
     
     const query = `

@@ -16,6 +16,7 @@ import {
 } from '#modules/auth/services/auth.service.js';
 
 
+// This controller function handles the registration of a new organization.
 export const registerOrganization: RequestHandler = asyncHandler(async (request, response) => {
 
     const input: RegisterOrganizationInput = request.body;
@@ -32,6 +33,7 @@ export const registerOrganization: RequestHandler = asyncHandler(async (request,
 });
 
 
+// This controller function handles the login of a user.
 export const loginUser: RequestHandler = asyncHandler(async (request, response) => {
 
     const input = request.body;
@@ -48,6 +50,7 @@ export const loginUser: RequestHandler = asyncHandler(async (request, response) 
 });
 
 
+// This controller function handles the refreshing of an access token.
 export const refreshToken: RequestHandler = asyncHandler(async (request, response) => {
 
     const input: RefreshInput = request.body;
@@ -64,6 +67,7 @@ export const refreshToken: RequestHandler = asyncHandler(async (request, respons
 });
 
 
+// This controller function handles the logout of a user from a specific session.
 export const logout: RequestHandler = asyncHandler(async (request, response) => {
 
     const input: LogoutInput = request.body;
@@ -80,6 +84,7 @@ export const logout: RequestHandler = asyncHandler(async (request, response) => 
 });
 
 
+// This controller function handles the logout of a user from all sessions.
 export const logoutAllSessions: RequestHandler = asyncHandler(async (request, response) => {
 
     const input: LogoutAllSessionsInput = request.body;

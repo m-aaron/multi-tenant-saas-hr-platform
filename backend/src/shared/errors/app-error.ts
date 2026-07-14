@@ -1,3 +1,4 @@
+// This class represents a custom application error that extends the built-in Error class.
 export class AppError extends Error {
 
     public readonly statusCode: number;

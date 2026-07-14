@@ -37,6 +37,7 @@ import {
 } from '#modules/session/repositories/session.repository.js';
 
 
+// This service function handles the registration of a new organization along with its owner user and employee.
 export async function registerOrganization(input: RegisterOrganizationInput): Promise<void> {
     
     await withTransaction(async (client) => {
@@ -81,6 +82,7 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
 }
 
 
+// This service function handles the login of a user and returns their user information along with access and refresh tokens.
 export async function login(input: LoginInput): Promise<LoginResult> {
 
     const result = await withTransaction(async (client) => {
@@ -147,6 +149,7 @@ export async function login(input: LoginInput): Promise<LoginResult> {
 }
 
 
+// This service function handles the refreshing of an access token using a valid refresh token and returns a new pair of access and refresh tokens.
 export async function refresh(refreshToken: string): Promise<TokenPair> {
 
     const result = await withTransaction(async (client) => {
@@ -207,6 +210,7 @@ export async function refresh(refreshToken: string): Promise<TokenPair> {
 }
 
 
+// This service function handles the logout of a user from a specific session.
 export async function logout(refreshToken: string): Promise<void> {
     
     await withTransaction(async (client) => {
@@ -237,6 +241,7 @@ export async function logout(refreshToken: string): Promise<void> {
 }
 
 
+// This service function handles the logout of a user from all active sessions.
 export async function logoutAllSessions(refreshToken: string): Promise<void> {
     
     await withTransaction(async (client) => {

@@ -6,6 +6,7 @@ import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 import { ForbiddenError } from '#shared/errors/forbidden-error.js';
 
 
+// This middleware function checks if the authenticated user has one of the required roles to access a specific route or resource.
 export function requireRole(...requiredRoles: RoleName[]): RequestHandler {
     
     return (req, _res, next) => {

@@ -9,6 +9,8 @@ import type { JwtPayload } from '../../auth/types/auth.type.js';
 import type { IssuedSessionResult } from '../types/session.type.js'
 
 
+// This service function issues a new session by generating access and refresh tokens, 
+// hashing the refresh token, and calculating the expiration date of the refresh token.
 export async function issueSession(payload: JwtPayload): Promise<IssuedSessionResult> {
 
     const tokens = generateTokens(payload);

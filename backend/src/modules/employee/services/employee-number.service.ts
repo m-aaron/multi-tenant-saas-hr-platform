@@ -1,6 +1,8 @@
 import type { PoolClient } from 'pg';
 
+
 export async function generateEmployeeNumber(client: PoolClient, organizationId: string): Promise<string> {
+    
     const result = await client.query<{count: string;}>(
         `SELECT COUNT(*) AS count
         FROM employees

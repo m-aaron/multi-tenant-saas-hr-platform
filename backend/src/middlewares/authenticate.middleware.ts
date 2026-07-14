@@ -11,6 +11,7 @@ import { findAuthenticatedUserById } from '#modules/auth/repositories/auth.repos
 import { USER_STATUS } from '#modules/user/constants/user.constant.js';
 
 
+// This middleware function authenticates incoming requests by verifying the provided access token in the Authorization header.
 export const authenticate: RequestHandler = async (req, _res, next) => {
     
     const client: PoolClient = await db.connect();
