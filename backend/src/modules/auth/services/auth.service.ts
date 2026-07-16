@@ -1,4 +1,4 @@
-import { withTransaction } from '#database/transaction.js';
+import { withTransaction } from '#databases/transaction.js';
 
 import { 
     createOrganization, 
@@ -17,14 +17,14 @@ import type { LoginInput } from '../schemas/login.schema.js';
 
 import type { LoginResult, TokenPair } from '../types/auth.type.js';
 
-import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/default.js';
+import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/employee.contant.js';
 
-import { hashPassword, verifyPassword } from '#shared/security/password.js';
-import { today } from '#shared/utils/date.js';
-import { generateUuid } from '#shared/utils/uuid.js';
+import { hashPassword, verifyPassword } from '#shared/utils/password.util.js';
+import { today } from '#shared/utils/date.util.js';
+import { generateUuid } from '#shared/utils/uuid.util.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
-import { verifyRefreshToken } from '../jwt.service.js';
-import { compareRefreshTokenHash } from '../utils/session.util.js';
+import { verifyRefreshToken } from './jwt.service.js';
+import { compareRefreshTokenHash } from '../utils/auth.util.js';
 
 import { ConflictError } from '#shared/errors/conflict-error.js';
 import { NotFoundError } from '#shared/errors/not-found-error.js';

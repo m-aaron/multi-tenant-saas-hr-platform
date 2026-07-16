@@ -1,6 +1,6 @@
 import type { PoolClient } from 'pg';
 
-import { db } from '#database/index.js';
+import { db } from '#databases/index.js';
 
 
 // This function executes a callback function within a database transaction. 

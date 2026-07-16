@@ -1,5 +1,5 @@
 import { Router, type Router as ExpressRouter } from 'express';
-import { performHealthCheck } from '#modules/health/health.service.js';
+import { performHealthCheck } from '#modules/health/services/health.service.js';
 
 const router: ExpressRouter = Router();
 

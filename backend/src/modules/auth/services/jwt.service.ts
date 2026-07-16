@@ -1,7 +1,7 @@
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
-import { env } from '#config/env.js';
-import type { JwtPayload } from './types/auth.type.js';
+import { env } from '#configs/env.js';
+import type { JwtPayload } from '../types/auth.type.js';
 
 import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 

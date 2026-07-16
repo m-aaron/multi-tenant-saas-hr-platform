@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-import { asyncHandler } from '#shared/utils/async-handler.js';
+import { asyncHandler } from '#shared/utils/async-handler.util.js';
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { RegisterOrganizationInput } from '#modules/auth/schemas/registration.schema.js';
 import type { RefreshInput } from '#modules/auth/schemas/refresh.schema.js';

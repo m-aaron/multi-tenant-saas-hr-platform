@@ -1,5 +1,5 @@
 import { authPaths } from '#modules/auth/docs/auth.openapi.js';
-import { securitySchemes } from './security.js';
+import { securitySchemes } from './openapi.security.js';
 
 export const openApiDocument = {
     openapi: '3.1.0',

@@ -1,6 +1,6 @@
 import type { PoolClient } from 'pg';
 
-import { generateUuid } from '#shared/utils/uuid.js';
+import { generateUuid } from '#shared/utils/uuid.util.js';
 
 import type { 
     CreateOrganizationInput, 

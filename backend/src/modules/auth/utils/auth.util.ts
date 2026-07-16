@@ -1,4 +1,4 @@
-import { hashPassword, verifyPassword } from '#shared/security/password.js';
+import { hashPassword, verifyPassword } from '#shared/utils/password.util.js';
 
 
 export async function hashRefreshToken(token: string): Promise<string> {

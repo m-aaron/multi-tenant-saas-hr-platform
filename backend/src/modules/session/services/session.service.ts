@@ -1,8 +1,8 @@
-import { env } from '#config/env.js';
+import { env } from '#configs/env.js';
 
-import { hashRefreshToken } from '../../auth/utils/session.util.js';
-import { generateTokens } from '../../auth/token.service.js';
-import { addDuration } from '#shared/utils/date.js';
+import { hashRefreshToken } from '../../auth/utils/auth.util.js';
+import { generateTokens } from '../../auth/services/token.service.js';
+import { addDuration } from '#shared/utils/date.util.js';
 
 import type { JwtPayload } from '../../auth/types/auth.type.js';
 

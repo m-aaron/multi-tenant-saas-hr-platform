@@ -1,11 +1,11 @@
 import { type RequestHandler } from 'express';
 import type { PoolClient } from 'pg';
 
-import { db } from '#database/index.js';
+import { db } from '#databases/index.js';
 
 import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 
-import { verifyAccessToken } from '#modules/auth/jwt.service.js';
+import { verifyAccessToken } from '#modules/auth/services/jwt.service.js';
 import { findAuthenticatedUserById } from '#modules/auth/repositories/auth.repository.js';
 
 import { USER_STATUS } from '#modules/user/constants/user.constant.js';

@@ -20,9 +20,9 @@
   },
   "type": "module",
   "imports": {
-    "#config/*.js": {
-      "@dev": "./src/config/*.ts",
-      "default": "./dist/config/*.js"
+    "#configs/*.js": {
+      "@dev": "./src/configs/*.ts",
+      "default": "./dist/configs/*.js"
     },
     "#modules/*.js": {
       "@dev": "./src/modules/*.ts",
@@ -32,9 +32,9 @@
       "@dev": "./src/shared/*.ts",
       "default": "./dist/shared/*.js"
     },
-    "#database/*.js": {
-      "@dev": "./src/database/*.ts",
-      "default": "./dist/database/*.js"
+    "#databases/*.js": {
+      "@dev": "./src/databases/*.ts",
+      "default": "./dist/databases/*.js"
     },
     "#docs/*.js": {
       "@dev": "./src/docs/*.ts",

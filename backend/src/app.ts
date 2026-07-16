@@ -2,9 +2,9 @@ import express, { type Express } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 
-import { API_PREFIX } from '#config/constant.js';
+import { API_PREFIX } from './configs/constant.js';
 
-import healthRouter from '#modules/health/health.route.js';
+import healthRouter from '#modules/health/routes/health.route.js';
 import authRouter from '#modules/auth/routes/auth.route.js';
 
 import { errorMiddleware } from './middlewares/error.middleware.js';

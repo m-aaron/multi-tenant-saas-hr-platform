@@ -1,5 +1,5 @@
-import { db } from '#database/index.js';
-import { env } from '#config/env.js';
+import { db } from '#databases/index.js';
+import { env } from '#configs/env.js';
 
 
 // Health check response interface

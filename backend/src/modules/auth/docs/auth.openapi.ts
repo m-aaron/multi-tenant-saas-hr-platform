@@ -2,14 +2,14 @@ import {
     successResponseSchema,
     errorResponseSchema,
     validationErrorResponseSchema
-} from '#docs/response.schema.js';
+} from '#docs/openapi.response.js';
 
 import {
     RegisterOrganizationRequestSchema,
     LoginRequestSchema,
     RefreshTokenRequestSchema,
     LogoutRequestSchema,
-} from './auth.schema.js';
+} from './auth.openapi.request.js';
 
 import {
     RegisterOrganizationPayloadSchema,
@@ -17,7 +17,7 @@ import {
     RefreshTokenPayloadSchema,
     LogoutPayloadSchema,
     LogoutAllSessionsPayloadSchema,
-} from './auth.response.js';
+} from './auth.openapi.response.js';
 
 
 /**
