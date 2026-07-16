@@ -21,6 +21,8 @@ export function errorMiddleware(
             message: error.message,
             error: error.errors
         })
+
+        return;
     }
 
     if (error instanceof AppError) {

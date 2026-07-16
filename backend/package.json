@@ -35,6 +35,14 @@
     "#database/*.js": {
       "@dev": "./src/database/*.ts",
       "default": "./dist/database/*.js"
+    },
+    "#docs/*.js": {
+      "@dev": "./src/docs/*.ts",
+      "default": "./dist/docs/*.js"
+    },
+    "#middlewares/*.js": {
+      "@dev": "./src/middlewares/*.ts",
+      "default": "./dist/middlewares/*.js"
     }
   },
   "dependencies": {
@@ -46,6 +54,7 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
     "pino": "^10.3.1",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -54,6 +63,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.0",
     "@types/pg": "^8.20.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "eslint": "^10.5.0",
     "pino-pretty": "^13.1.3",
     "prettier": "^3.8.4",

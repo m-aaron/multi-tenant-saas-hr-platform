@@ -26,6 +26,8 @@ import { generateEmployeeNumber } from '#modules/employee/services/employee-numb
 import { verifyRefreshToken } from '../jwt.service.js';
 import { compareRefreshTokenHash } from '../utils/session.util.js';
 
+import { ConflictError } from '#shared/errors/conflict-error.js';
+import { NotFoundError } from '#shared/errors/not-found-error.js';
 import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 import { ForbiddenError } from '#shared/errors/forbidden-error.js';
 
@@ -47,9 +49,18 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
             slug: input.organizationSlug,
         });
 
+        if (!organizationId) {
+            throw new ConflictError('Organization slug or email already exists.')
+        }
+
         await seedDefaultRoles(client, organizationId);
 
         const ownerRoleId = await findRoleByName(client, organizationId, OWNER_EMPLOYEE_DEFAULTS.jobTitle);
+
+        if (!ownerRoleId) {
+            throw new NotFoundError('Owner role not found.');
+        }
+
         const employeeNumber = await generateEmployeeNumber(client, organizationId);
 
         const employeeId = await createEmployee(client, {
@@ -156,14 +167,10 @@ export async function refresh(refreshToken: string): Promise<TokenPair> {
 
         const payload = verifyRefreshToken(refreshToken);
 
-        if (!payload) {
-            throw new UnauthorizedError('Invalid refresh token.');
-        }
-
         const session = await findSessionById(client, payload.sid);
 
         if (!session) {
-            throw new UnauthorizedError('Session not found.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         const { 
@@ -176,17 +183,17 @@ export async function refresh(refreshToken: string): Promise<TokenPair> {
         } = session;
 
         if (revokedAt) {
-            throw new UnauthorizedError('Session has been revoked.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         if (expiresAt < new Date()) {
-            throw new UnauthorizedError('Session has expired.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         const refreshTokenMatches = await compareRefreshTokenHash(refreshTokenHash, refreshToken);
 
         if (!refreshTokenMatches) {
-            throw new UnauthorizedError('Invalid refresh token.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         const updatedSession =  await issueSession({
@@ -217,22 +224,18 @@ export async function logout(refreshToken: string): Promise<void> {
         
         const payload = verifyRefreshToken(refreshToken);
 
-        if (!payload) {
-            throw new UnauthorizedError('Invalid refresh token.');
-        }
-
         const session = await findSessionById(client, payload.sid);
 
         if (!session) {
-            throw new UnauthorizedError('Session not found.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         if (session.revokedAt) {
-            throw new UnauthorizedError('Session has been revoked.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         if (session.expiresAt < new Date()) {
-            throw new UnauthorizedError('Session has expired.');
+            throw new UnauthorizedError('Invalid or expired refresh token.');
         }
 
         await revokeSession(client, session.id);
@@ -242,16 +245,10 @@ export async function logout(refreshToken: string): Promise<void> {
 
 
 // This service function handles the logout of a user from all active sessions.
-export async function logoutAllSessions(refreshToken: string): Promise<void> {
+export async function logoutAllSessions(userId: string | undefined): Promise<void> {
     
     await withTransaction(async (client) => {
-        
-        const payload = verifyRefreshToken(refreshToken);
-
-        if (!payload) {
-            throw new UnauthorizedError('Invalid refresh token.');
-        }
-
-        await revokeAllSessions(client, payload.sub);
+    
+        await revokeAllSessions(client, userId);
     });
 }

@@ -5,7 +5,8 @@ import { registerOrganizationSchema } from '../schemas/registration.schema.js';
 import { loginSchema } from '../schemas/login.schema.js';
 import { refreshSchema } from '../schemas/refresh.schema.js';
 import { logoutSchema } from '../schemas/logout.schema.js';
-import { logoutAllSessionsSchema } from '../schemas/logout-all.schema.js';
+
+import { authenticate } from '#middlewares/authenticate.middleware.js';
 
 import { 
     registerOrganization, 
@@ -22,6 +23,6 @@ router.post('/register', validate(registerOrganizationSchema), registerOrganizat
 router.post('/login', validate(loginSchema), loginUser);
 router.post('/refresh', validate(refreshSchema), refreshToken);
 router.post('/logout', validate(logoutSchema), logout);
-router.post('/logout-all', validate(logoutAllSessionsSchema), logoutAllSessions);
+router.post('/logout-all', authenticate, logoutAllSessions);
 
 export default router;

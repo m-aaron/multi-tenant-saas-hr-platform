@@ -35,26 +35,22 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
 
         const payload = verifyAccessToken(token);
 
-        if (!payload) {
-            throw new UnauthorizedError('Invalid token');
-        }
-
         const user = await findAuthenticatedUserById(client, payload.sub);
 
         if (!user) {
-            throw new UnauthorizedError('User not found');
+            throw new UnauthorizedError('User not found.');
         }
 
         if (user.organizationDeletedAt) {
-            throw new UnauthorizedError('Organization has been deleted');
+            throw new UnauthorizedError('Organization has been deleted.');
         }
 
         if (user.status === USER_STATUS.INACTIVE) {
-            throw new UnauthorizedError('User account is inactive');
+            throw new UnauthorizedError('User account is inactive.');
         }
 
         if (user.userDeletedAt) {
-            throw new UnauthorizedError('User account has been deleted');
+            throw new UnauthorizedError('User account has been deleted.');
         }
 
         req.user = {

@@ -14,7 +14,7 @@ export function requireRole(...requiredRoles: RoleName[]): RequestHandler {
         const user = req.user;
 
         if (!user) {
-            throw new UnauthorizedError('User not authenticated');
+            throw new UnauthorizedError('User not authenticated.');
         }    
 
         const userRole = user.roleName;

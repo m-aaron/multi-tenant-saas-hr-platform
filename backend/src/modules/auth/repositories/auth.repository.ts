@@ -14,18 +14,20 @@ import type {
 
 import { DEFAULT_ROLES, type RoleName } from '#modules/role/constants/role.constant.js';
 
-import { NotFoundError } from '#shared/errors/not-found-error.js';
-
 
 // This function creates a new organization in the database and returns its unique identifier.
-export async function createOrganization(client: PoolClient, input: CreateOrganizationInput): Promise<string> {
+export async function createOrganization(client: PoolClient, input: CreateOrganizationInput): Promise<string | null> {
     
     const organizationId = generateUuid();
 
-    await client.query(
+    const result = await client.query(
         'INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)',
         [organizationId, input.name, input.slug]
     );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
 
     return organizationId;
 }
@@ -63,7 +65,7 @@ export async function seedDefaultRoles(client: PoolClient, organizationId: strin
 
 
 // This function finds the ID of a role by its name within a specific organization.
-export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string> {
+export async function findRoleByName(client: PoolClient, organizationId: string, roleName: RoleName): Promise<string | null> {
 
     const result = await client.query(
         `SELECT 
@@ -76,8 +78,8 @@ export async function findRoleByName(client: PoolClient, organizationId: string,
         [organizationId, roleName]
     );
 
-    if (result.rowCount === 0 || !result.rows[0]) {
-        throw new NotFoundError('Owner role not found.');
+    if (result.rows.length === 0) {
+        return null;
     }
 
     return result.rows[0].id;
@@ -236,13 +238,16 @@ export async function revokeSession(client: PoolClient, sessionId: string): Prom
 
 
 // This function revokes all active sessions for a specific user in the database.
-export async function revokeAllSessions(client: PoolClient, userId: string): Promise<number | null> {
+export async function revokeAllSessions(client: PoolClient, userId: string | undefined): Promise<number | null> {
     
     const query = `
         UPDATE sessions
         SET 
             revoked_at = NOW()
-        WHERE user_id = $1 AND revoked_at IS NULL
+        WHERE 
+            user_id = $1 
+            AND revoked_at IS NULL 
+            AND expires_at > NOW()
     `;
 
     const result = await client.query(query, [userId]);

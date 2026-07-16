@@ -10,12 +10,16 @@ import authRouter from '#modules/auth/routes/auth.route.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import { notFoundMiddleware } from './middlewares/not-found.middleware.js';
 
+import { setupSwagger } from '#docs/swagger.js';
+
 
 const app: Express = express();
 
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+setupSwagger(app);
 
 app.use(`${API_PREFIX}`, healthRouter); // Health check route
 app.use(`${API_PREFIX}/auth`, authRouter);

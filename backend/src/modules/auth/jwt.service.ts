@@ -3,6 +3,8 @@ import jwt, { type SignOptions } from 'jsonwebtoken';
 import { env } from '#config/env.js';
 import type { JwtPayload } from './types/auth.type.js';
 
+import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
+
 type ExpiresIn = NonNullable<SignOptions['expiresIn']>;
 
 function buildOptions(expiresIn?: string): SignOptions {
@@ -40,15 +42,23 @@ export function signRefreshToken(payload: JwtPayload): string {
 }
 
 export function verifyAccessToken(token: string): JwtPayload {
-    return jwt.verify(
-        token,
-        env.jwt.accessTokenSecret,
-    ) as JwtPayload;
+    try {
+        return jwt.verify(
+            token,
+            env.jwt.accessTokenSecret,
+        ) as JwtPayload;
+    } catch (error) {
+        throw new UnauthorizedError('Invalid or expired access token.');
+    }
 }
 
 export function verifyRefreshToken(token: string): JwtPayload {
-    return jwt.verify(
-        token,
-        env.jwt.refreshTokenSecret,
-    ) as JwtPayload;
+    try {
+        return jwt.verify(
+            token,
+            env.jwt.refreshTokenSecret,
+        ) as JwtPayload;
+    } catch (error) {
+        throw new UnauthorizedError('Invalid or expired refresh token.');
+    }
 }

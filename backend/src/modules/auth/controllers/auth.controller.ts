@@ -5,7 +5,6 @@ import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { RegisterOrganizationInput } from '#modules/auth/schemas/registration.schema.js';
 import type { RefreshInput } from '#modules/auth/schemas/refresh.schema.js';
 import type { LogoutInput } from '../schemas/logout.schema.js';
-import type { LogoutAllSessionsInput } from '../schemas/logout-all.schema.js';
 
 import { 
     registerOrganization as registerOrganizationService,
@@ -25,7 +24,7 @@ export const registerOrganization: RequestHandler = asyncHandler(async (request,
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,
-        message: 'Organization registered successfully',
+        message: 'Organization registered successfully.',
         data: null
     }
 
@@ -42,7 +41,7 @@ export const loginUser: RequestHandler = asyncHandler(async (request, response) 
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
-        message: 'Login successful',
+        message: 'Login successful.',
         data: result
     }
 
@@ -59,7 +58,7 @@ export const refreshToken: RequestHandler = asyncHandler(async (request, respons
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
-        message: 'Token refreshed successfully',
+        message: 'Token refreshed successfully.',
         data: result
     }
 
@@ -76,7 +75,7 @@ export const logout: RequestHandler = asyncHandler(async (request, response) => 
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,
-        message: 'Logout successful',
+        message: 'Logout successful.',
         data: null
     }
 
@@ -87,13 +86,13 @@ export const logout: RequestHandler = asyncHandler(async (request, response) => 
 // This controller function handles the logout of a user from all sessions.
 export const logoutAllSessions: RequestHandler = asyncHandler(async (request, response) => {
 
-    const input: LogoutAllSessionsInput = request.body;
+    const userId = request.user?.id;
 
-    await logoutAllSessionsService(input.refreshToken);
+    await logoutAllSessionsService(userId);
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,
-        message: 'All sessions logged out successfully',
+        message: 'All sessions logged out successfully.',
         data: null
     }
 
