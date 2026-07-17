@@ -1,4 +1,5 @@
 import { authPaths } from '#modules/auth/docs/auth.openapi.js';
+import { organizationPaths } from '#modules/organization/docs/organization.openapi.js';
 import { securitySchemes } from './openapi.security.js';
 
 export const openApiDocument = {
@@ -24,6 +25,10 @@ export const openApiDocument = {
             description:
                 'Registration, authentication, token refresh and session management.',
         },
+        {
+            name: 'Organization',
+            description: 'Organization settings and profile management.',
+        },
     ],
 
     components: {
@@ -32,5 +37,6 @@ export const openApiDocument = {
 
     paths: {
         ...authPaths,
+        ...organizationPaths,
     },
 };

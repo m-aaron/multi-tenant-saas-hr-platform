@@ -50,15 +50,12 @@ export const authPaths = {
 
             requestBody: {
                 required: true,
-
                 content: {
                     'application/json': {
                         schema: RegisterOrganizationRequestSchema,
-
                         examples: {
                             default: {
                                 summary: 'Organization Registration',
-
                                 value: {
                                     organizationName: 'Acme Corporation',
                                     organizationSlug: 'acme-corporation',
@@ -74,15 +71,12 @@ export const authPaths = {
                     },
                 },
             },
-
             responses: {
                 201: {
                     description: 'Organization registered successfully.',
-
                     content: {
                         'application/json': {
                             schema: successResponseSchema(RegisterOrganizationPayloadSchema),
-
                             example: {
                                 success: true,
                                 message: 'Organization registered successfully.',
@@ -91,29 +85,27 @@ export const authPaths = {
                         },
                     },
                 },
-
-                409: {
-                    description: 'Organization slug or email already exists.',
-
+                400: {
+                    description: 'Validation failed.',
                     content: {
                         'application/json': {
-                            schema: errorResponseSchema(),
-
+                            schema: validationErrorResponseSchema(),
                             example: {
                                 success: false,
-                                message: 'Organization slug or email already exists.',
+                                message: 'Validation failed.',
+                                errors: [{ 
+                                    field: 'ownerEmail', 
+                                    message: 'Invalid email address.' 
+                                }],
                             },
                         },
                     },
                 },
-
                 404: {
                     description: 'Owner role not found.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Owner role not found.',
@@ -121,32 +113,23 @@ export const authPaths = {
                         },
                     },
                 },
-
-                400: {
-                    description: 'Validation failed.',
-
+                409: {
+                    description: 'Organization slug or email already exists.',
                     content: {
                         'application/json': {
-                            schema: validationErrorResponseSchema(),
-
+                            schema: errorResponseSchema(),
                             example: {
                                 success: false,
-                                message: 'Validation failed.',
-                                errors: [
-                                    { field: 'ownerEmail', message: 'Invalid email' },
-                                ],
+                                message: 'Organization slug or email already exists.',
                             },
                         },
                     },
                 },
-
                 500: {
                     description: 'Internal server error.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Internal server error.',
@@ -172,15 +155,12 @@ export const authPaths = {
 
             requestBody: {
                 required: true,
-
                 content: {
                     'application/json': {
                         schema: LoginRequestSchema,
-
                         examples: {
                             default: {
                                 summary: 'Login Request',
-
                                 value: {
                                     organizationSlug: 'acme-corporation',
                                     email: 'owner@example.com',
@@ -191,17 +171,14 @@ export const authPaths = {
                     },
                 },
             },
-
             responses: {
                 200: {
                     description: 'Login successful.',
-
                     content: {
                         'application/json': {
                             schema: successResponseSchema(
                                 LoginPayloadSchema,
                             ),
-
                             example: {
                                 success: true,
                                 message: 'Login successful.',
@@ -222,14 +199,27 @@ export const authPaths = {
                         },
                     },
                 },
-
+                400: {
+                    description: 'Validation failed.',
+                    content: {
+                        'application/json': {
+                            schema: validationErrorResponseSchema(),
+                            example: {
+                                success: false,
+                                message: 'Validation failed.',
+                                errors: [{ 
+                                    field: 'email', 
+                                    message: 'Invalid email address.' 
+                                }],
+                            },
+                        },
+                    },
+                },
                 401: {
                     description: 'Invalid credentials.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Invalid credentials.',
@@ -237,14 +227,11 @@ export const authPaths = {
                         },
                     },
                 },
-
                 403: {
-                    description: 'User account is not active.',
-
+                    description: 'Forbidden. User account is not active.',
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'User account is not active.',
@@ -252,32 +239,11 @@ export const authPaths = {
                         },
                     },
                 },
-
-                400: {
-                    description: 'Validation failed.',
-
-                    content: {
-                        'application/json': {
-                            schema: validationErrorResponseSchema(),
-
-                            example: {
-                                success: false,
-                                message: 'Validation failed.',
-                                errors: [
-                                    { field: 'email', message: 'Invalid email' },
-                                ],
-                            },
-                        },
-                    },
-                },
-
                 500: {
                     description: 'Internal server error.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Internal server error.',
@@ -303,15 +269,12 @@ export const authPaths = {
 
             requestBody: {
                 required: true,
-
                 content: {
                     'application/json': {
                         schema: RefreshTokenRequestSchema,
-
                         examples: {
                             default: {
                                 summary: 'Refresh Token',
-
                                 value: {
                                     refreshToken:
                                         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
@@ -321,17 +284,14 @@ export const authPaths = {
                     },
                 },
             },
-
             responses: {
                 200: {
                     description: 'Token refreshed successfully.',
-
                     content: {
                         'application/json': {
                             schema: successResponseSchema(
                                 RefreshTokenPayloadSchema,
                             ),
-
                             example: {
                                 success: true,
                                 message: 'Token refreshed successfully.',
@@ -343,15 +303,27 @@ export const authPaths = {
                         },
                     },
                 },
-
+                400: {
+                    description: 'Validation failed.',
+                    content: {
+                        'application/json': {
+                            schema: validationErrorResponseSchema(),
+                            example: {
+                                success: false,
+                                message: 'Validation failed.',
+                                errors: [{ 
+                                    field: 'refreshToken', 
+                                    message: 'Refresh token is required.' 
+                                }],
+                            },
+                        },
+                    },
+                },
                 401: {
-                    description:
-                        'Invalid or expired refresh token.',
-
+                    description: 'Invalid or expired refresh token.',
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Invalid or expired refresh token.',
@@ -359,32 +331,11 @@ export const authPaths = {
                         },
                     },
                 },
-
-                400: {
-                    description: 'Validation failed.',
-
-                    content: {
-                        'application/json': {
-                            schema: validationErrorResponseSchema(),
-
-                            example: {
-                                success: false,
-                                message: 'Validation failed.',
-                                errors: [
-                                    { field: 'refreshToken', message: 'Required' },
-                                ],
-                            },
-                        },
-                    },
-                },
-
                 500: {
                     description: 'Internal server error.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Internal server error.',
@@ -410,15 +361,12 @@ export const authPaths = {
 
             requestBody: {
                 required: true,
-
                 content: {
                     'application/json': {
                         schema: LogoutRequestSchema,
-
                         examples: {
                             default: {
                                 summary: 'Logout',
-
                                 value: {
                                     refreshToken:
                                         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
@@ -428,17 +376,14 @@ export const authPaths = {
                     },
                 },
             },
-
             responses: {
                 200: {
                     description: 'Logout successful.',
-
                     content: {
                         'application/json': {
                             schema: successResponseSchema(
                                 LogoutPayloadSchema,
                             ),
-
                             example: {
                                 success: true,
                                 message: 'Logout successful.',
@@ -447,14 +392,27 @@ export const authPaths = {
                         },
                     },
                 },
-
+                400: {
+                    description: 'Validation failed.',
+                    content: {
+                        'application/json': {
+                            schema: validationErrorResponseSchema(),
+                            example: {
+                                success: false,
+                                message: 'Validation failed.',
+                                errors: [{ 
+                                    field: 'refreshToken', 
+                                    message: 'Refresh token is required.' 
+                                }],
+                            },
+                        },
+                    },
+                },
                 401: {
                     description: 'Invalid or expired refresh token.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Invalid or expired refresh token.',
@@ -462,32 +420,11 @@ export const authPaths = {
                         },
                     },
                 },
-
-                400: {
-                    description: 'Validation failed.',
-
-                    content: {
-                        'application/json': {
-                            schema: validationErrorResponseSchema(),
-
-                            example: {
-                                success: false,
-                                message: 'Validation failed.',
-                                errors: [
-                                    { field: 'refreshToken', message: 'Required' },
-                                ],
-                            },
-                        },
-                    },
-                },
-
                 500: {
                     description: 'Internal server error.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Internal server error.',
@@ -508,21 +445,16 @@ export const authPaths = {
             tags: [AUTH_TAG],
             summary: 'Logout from all devices',
             operationId: 'logoutAllSessions',
-            description:
-                'Revokes every active session belonging to the authenticated user.',
-
+            description: 'Revokes every active session belonging to the authenticated user.',
             security: [{ bearerAuth: [] }],
-
             responses: {
                 200: {
                     description: 'All sessions logged out successfully.',
-
                     content: {
                         'application/json': {
                             schema: successResponseSchema(
                                 LogoutAllSessionsPayloadSchema,
                             ),
-
                             example: {
                                 success: true,
                                 message: 'All sessions logged out successfully.',
@@ -531,14 +463,11 @@ export const authPaths = {
                         },
                     },
                 },
-
                 401: {
                     description: 'Missing or invalid access token.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Invalid or expired access token.',
@@ -546,14 +475,11 @@ export const authPaths = {
                         },
                     },
                 },
-
                 500: {
                     description: 'Internal server error.',
-
                     content: {
                         'application/json': {
                             schema: errorResponseSchema(),
-
                             example: {
                                 success: false,
                                 message: 'Internal server error.',
