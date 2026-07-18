@@ -37,13 +37,7 @@ export async function createDepartment(
 
         const department =  await insertDepartment(client, organizationId, input);
 
-        return {
-            id: department.id,
-            organizationId: department.organizationId,
-            name: department.name,
-            createdAt: department.createdAt,
-            updatedAt: department.updatedAt
-        };
+        return department;
     });
 
     return result;
@@ -60,14 +54,14 @@ export async function updateDepartment(
     const result = await withTransaction(async (client) => {
 
         // Fetch current department and verify existence and tenant isolation
-        const current = await findDepartmentById(client, organizationId, id);
+        const currentDepartment = await findDepartmentById(client, organizationId, id);
 
-        if (!current) {
+        if (!currentDepartment) {
             throw new NotFoundError('Department not found.');
         }
 
         // Check duplicate name if the name is changing (case-insensitive check)
-        if (current.name.toLowerCase() !== input.name.toLowerCase()) {
+        if (currentDepartment.name.toLowerCase() !== input.name.toLowerCase()) {
 
             const existing = await findDepartmentByName(client, organizationId, input);
 
@@ -76,19 +70,13 @@ export async function updateDepartment(
             }
         }
 
-        const updated = await updateDepartmentName(client, id, input);
+        const updatedDepartment = await updateDepartmentName(client, id, input);
 
-        if (!updated) {
+        if (!updatedDepartment) {
             throw new NotFoundError('Department not found.');
         }
 
-        return {
-            id: updated.id,
-            organizationId: updated.organizationId,
-            name: updated.name,
-            createdAt: updated.createdAt,
-            updatedAt: updated.updatedAt
-        };
+        return updatedDepartment;
     });
 
     return result;
@@ -130,13 +118,7 @@ export async function getDepartmentById(
             throw new NotFoundError('Department not found.');
         }
 
-        return {
-            id: department.id,
-            organizationId: department.organizationId,
-            name: department.name,
-            createdAt: department.createdAt,
-            updatedAt: department.updatedAt
-        };
+        return department;
     });
 
     return result;
@@ -156,9 +138,9 @@ export async function deleteDepartment(
     await withTransaction(async (client) => {
 
         // Fetch current department and verify existence and tenant isolation
-        const current = await findDepartmentById(client, organizationId, id);
+        const department = await findDepartmentById(client, organizationId, id);
 
-        if (!current) {
+        if (!department) {
             throw new NotFoundError('Department not found.');
         }
 

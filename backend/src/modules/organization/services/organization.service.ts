@@ -29,13 +29,7 @@ export async function getCurrentOrganization(
             throw new ForbiddenError('Organization is not active.')
         }
 
-        return {
-            id: organization.id,
-            name: organization.name,
-            slug: organization.slug,
-            createdAt: organization.createdAt,
-            updatedAt: organization.updatedAt
-        };
+        return organization;
     });
 
     return result;
@@ -50,27 +44,21 @@ export async function updateCurrentOrganization(
 
     const result = await withTransaction(async (client) => {
 
-        const updatedOrganization = await updateOrganizationById(
+        const organization = await updateOrganizationById(
             client, 
             input.organizationName,
             organizationId
         );
 
-        if (!updatedOrganization) {
+        if (!organization) {
             throw new NotFoundError('Organization not found.')
         }
 
-        if (updatedOrganization.revokedAt) {
+        if (organization.revokedAt) {
             throw new ForbiddenError('Organization is not active.')
         }
 
-        return {
-            id: updatedOrganization.id,
-            name: updatedOrganization.name,
-            slug: updatedOrganization.slug,
-            createdAt: updatedOrganization.createdAt,
-            updatedAt: updatedOrganization.updatedAt
-        };
+        return organization;
     });
 
     return result;
