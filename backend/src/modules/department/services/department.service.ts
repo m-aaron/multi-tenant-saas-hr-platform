@@ -109,3 +109,33 @@ export async function getDepartments(
     return result;
 }
 
+
+// This service function retrieves a department by its ID.
+export async function getDepartmentById(
+    organizationId: string | undefined,
+    id: string
+): Promise<DepartmentRow | null> {
+    
+    if (!organizationId) {
+        return null;
+    }
+
+    const result = await withTransaction(async (client) => {
+        
+        const department = await findDepartmentById(client, organizationId, id);
+
+        if (!department) {
+            throw new NotFoundError('Department not found.');
+        }
+
+        return {
+            id: department.id,
+            organizationId: department.organizationId,
+            name: department.name,
+            createdAt: department.createdAt,
+            updatedAt: department.updatedAt
+        };
+    });
+
+    return result;
+}

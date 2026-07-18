@@ -9,9 +9,9 @@ import type { CreateDepartmentInput, UpdateDepartmentInput } from "../schemas/de
 import { 
     createDepartment as createDepartmentService,
     updateDepartment as updateDepartmentService,
-    getDepartments as getDepartmentsService
+    getDepartments as getDepartmentsService,
+    getDepartmentById as getDepartmentByIdService,
 } from "../services/department.service.js";
-import { logger } from '#shared/logger/logger.js';
 
 
 // This controller function handles creating a new department for the authenticated user's organization.
@@ -56,8 +56,6 @@ export const getDepartments: RequestHandler = asyncHandler(async (request, respo
     
     const organizationId = request.user?.organizationId;
 
-    logger.info(`Fetching departments for organization ID: ${organizationId}`);
-
     const result = await getDepartmentsService(organizationId);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
@@ -69,3 +67,20 @@ export const getDepartments: RequestHandler = asyncHandler(async (request, respo
     response.status(200).json(responseBody);
 });
 
+
+// This controller function handles retrieving a department by its ID for the authenticated user's organization.
+export const getDepartmentById: RequestHandler = asyncHandler(async (request, response) => {
+    
+    const organizationId = request.user?.organizationId;
+    const departmentId = request.params['departmentId'] as string;
+
+    const result = await getDepartmentByIdService(organizationId, departmentId);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'Department retrieved successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
+});
