@@ -4,9 +4,12 @@ import { asyncHandler } from "#shared/utils/async-handler.util.js";
 
 import type { ApiSuccessResponse } from "#shared/types/api-response.type.js";
 
-import type { CreateDepartmentInput } from "../schemas/department.schema.js";
+import type { CreateDepartmentInput, UpdateDepartmentInput } from "../schemas/department.schema.js";
 
-import { createDepartment as createDepartmentService } from "../services/department.service.js";
+import { 
+    createDepartment as createDepartmentService,
+    updateDepartment as updateDepartmentService
+} from "../services/department.service.js";
 
 
 // This controller function handles creating a new department for the authenticated user's organization.
@@ -20,6 +23,26 @@ export const createDepartment: RequestHandler = asyncHandler(async (request, res
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
         message: 'Department created successfully.',
+        data: result
+    };
+
+    response.status(201).json(responseBody);
+});
+
+
+// This controller function handles updating a department's details for the authenticated user's organization.
+export const updateDepartment: RequestHandler = asyncHandler(async (request, response) => {
+
+    const organizationId = request.user?.organizationId;
+    const departmentId = request.params['departmentId'] as string;
+    const input: UpdateDepartmentInput = request.body;
+
+
+    const result = await updateDepartmentService(organizationId, departmentId, input);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'Department updated successfully.',
         data: result
     };
 
