@@ -11,6 +11,7 @@ import {
     updateDepartment as updateDepartmentService,
     getDepartments as getDepartmentsService,
     getDepartmentById as getDepartmentByIdService,
+    deleteDepartment as deleteDepartmentService,
 } from "../services/department.service.js";
 
 
@@ -80,6 +81,24 @@ export const getDepartmentById: RequestHandler = asyncHandler(async (request, re
         success: true,
         message: 'Department retrieved successfully.',
         data: result
+    };
+
+    response.status(200).json(responseBody);
+});
+
+
+// This controller function handles soft deleting a department by its ID for the authenticated user's organization.
+export const deleteDepartment: RequestHandler = asyncHandler(async (request, response) => {
+
+    const organizationId = request.user?.organizationId;
+    const departmentId = request.params['departmentId'] as string;
+
+    await deleteDepartmentService(organizationId, departmentId);
+
+    const responseBody: ApiSuccessResponse<null> = {
+        success: true,
+        message: 'Department deleted successfully.',
+        data: null
     };
 
     response.status(200).json(responseBody);

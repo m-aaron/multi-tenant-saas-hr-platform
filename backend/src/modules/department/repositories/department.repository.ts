@@ -221,3 +221,51 @@ export async function findDepartmentsByOrganizationId(
 }
 
 
+// This function clears the department association for all employees in a given department.
+export async function clearEmployeesDepartment(
+    client: PoolClient,
+    organizationId: string,
+    departmentId: string
+): Promise<void> {
+    
+    const query = `
+        UPDATE employees
+        SET 
+            department_id = NULL,
+            updated_at = NOW()
+        WHERE 
+            department_id = $1 
+            AND organization_id = $2
+            AND deleted_at IS NULL
+    `;
+
+    await client.query(query, [departmentId, organizationId]);
+}
+
+
+// This function soft deletes a department by setting its deleted_at column to NOW().
+export async function softDeleteDepartment(
+    client: PoolClient,
+    organizationId: string,
+    id: string
+): Promise<boolean> {
+    
+    const query = `
+        UPDATE departments
+        SET 
+            deleted_at = NOW(),
+            updated_at = NOW()
+        WHERE 
+            id = $1 
+            AND organization_id = $2
+            AND deleted_at IS NULL
+        RETURNING id
+    `;
+
+    const result = await client.query(query, [id, organizationId]);
+
+    return result.rows.length > 0;
+}
+
+
+

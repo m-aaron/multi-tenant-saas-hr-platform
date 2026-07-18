@@ -11,7 +11,8 @@ import {
     createDepartment, 
     updateDepartment, 
     getDepartments,
-    getDepartmentById
+    getDepartmentById,
+    deleteDepartment
 } from "../controllers/department.controller.js";
 
 
@@ -45,6 +46,13 @@ router.patch(
     requireRole('owner', 'administrator'),
     validate(updateDepartmentSchema),
     updateDepartment
+);
+
+router.delete(
+    '/:departmentId',
+    authenticate,
+    requireRole('owner', 'administrator'),
+    deleteDepartment
 );
 
 export default router;

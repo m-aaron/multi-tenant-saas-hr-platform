@@ -14,7 +14,9 @@ import {
     insertDepartment,
     findDepartmentById,
     updateDepartmentName,
-    findDepartmentsByOrganizationId
+    findDepartmentsByOrganizationId,
+    clearEmployeesDepartment,
+    softDeleteDepartment
 } from "../repositories/department.repository.js";
 
 
@@ -138,4 +140,35 @@ export async function getDepartmentById(
     });
 
     return result;
+}
+
+
+// This service function soft deletes a department, first unlinking associated employees.
+export async function deleteDepartment(
+    organizationId: string | undefined,
+    id: string
+): Promise<void> {
+
+    if (!organizationId) {
+        throw new NotFoundError('Department not found.');
+    }
+
+    await withTransaction(async (client) => {
+
+        // Fetch current department and verify existence and tenant isolation
+        const current = await findDepartmentById(client, organizationId, id);
+
+        if (!current) {
+            throw new NotFoundError('Department not found.');
+        }
+
+        // Clear department_id for any employees currently in this department
+        await clearEmployeesDepartment(client, organizationId, id);
+
+        const deleted = await softDeleteDepartment(client, organizationId, id);
+
+        if (!deleted) {
+            throw new NotFoundError('Department not found.');
+        }
+    });
 }
