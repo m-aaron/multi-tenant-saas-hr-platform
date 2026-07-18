@@ -1,6 +1,9 @@
+import { securitySchemes } from './openapi.security.js';
+
 import { authPaths } from '#modules/auth/docs/auth.openapi.js';
 import { organizationPaths } from '#modules/organization/docs/organization.openapi.js';
-import { securitySchemes } from './openapi.security.js';
+import { departmentPaths } from '#modules/department/docs/department.openapi.js';
+
 
 export const openApiDocument = {
     openapi: '3.1.0',
@@ -29,6 +32,10 @@ export const openApiDocument = {
             name: 'Organization',
             description: 'Organization settings and profile management.',
         },
+        {
+            name: 'Department',
+            description: 'Department settings and management.',
+        },
     ],
 
     components: {
@@ -38,5 +45,6 @@ export const openApiDocument = {
     paths: {
         ...authPaths,
         ...organizationPaths,
+        ...departmentPaths,
     },
 };
