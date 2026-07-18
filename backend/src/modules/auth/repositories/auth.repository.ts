@@ -21,7 +21,7 @@ export async function createOrganization(client: PoolClient, input: CreateOrgani
     const organizationId = generateUuid();
 
     const result = await client.query(
-        'INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3)',
+        'INSERT INTO organizations (id, name, slug) VALUES ($1, $2, $3) RETURNING *',
         [organizationId, input.name, input.slug]
     );
 
