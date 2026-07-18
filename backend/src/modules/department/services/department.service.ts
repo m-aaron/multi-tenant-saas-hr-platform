@@ -13,7 +13,8 @@ import {
     findDepartmentByName, 
     insertDepartment,
     findDepartmentById,
-    updateDepartmentName
+    updateDepartmentName,
+    findDepartmentsByOrganizationId
 } from "../repositories/department.repository.js";
 
 
@@ -90,3 +91,21 @@ export async function updateDepartment(
 
     return result;
 }
+
+
+// This service function retrieves all active departments in a user's organization.
+export async function getDepartments(
+    organizationId: string | undefined
+): Promise<DepartmentRow[]> {
+    
+    if (!organizationId) {
+        return [];
+    }
+
+    const result = await withTransaction(async (client) => {
+        return await findDepartmentsByOrganizationId(client, organizationId);
+    });
+
+    return result;
+}
+

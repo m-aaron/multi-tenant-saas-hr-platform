@@ -188,3 +188,36 @@ export async function updateDepartmentName(
     };
 }
 
+
+// This function finds all active departments in the database for a specific organization.
+export async function findDepartmentsByOrganizationId(
+    client: PoolClient,
+    organizationId: string | undefined
+): Promise<DepartmentRow[]> {
+    
+    const query = `
+        SELECT 
+            id, 
+            organization_id, 
+            name, 
+            created_at, 
+            updated_at
+        FROM departments
+        WHERE 
+            organization_id = $1 
+            AND deleted_at IS NULL
+        ORDER BY name ASC
+    `;
+
+    const result = await client.query(query, [organizationId]);
+
+    return result.rows.map(row => ({
+        id: row.id,
+        organizationId: row.organization_id,
+        name: row.name,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    }));
+}
+
+

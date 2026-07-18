@@ -5,10 +5,17 @@ import { requireRole } from "#middlewares/require-role.middleware.js";
 
 import { validate } from "#shared/validation/validate.js";
 import { createDepartmentSchema, updateDepartmentSchema } from "../schemas/department.schema.js";
-import { createDepartment, updateDepartment } from "../controllers/department.controller.js";
+import { createDepartment, updateDepartment, getDepartments } from "../controllers/department.controller.js";
 
 
 const router: Router = Router();
+
+router.get(
+    '/',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    getDepartments
+);
 
 router.post(
     '/',
