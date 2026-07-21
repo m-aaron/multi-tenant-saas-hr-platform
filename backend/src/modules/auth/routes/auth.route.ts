@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
 import { validate } from '#shared/validation/validate.js';
-import { registerOrganizationSchema } from '../schemas/registration.schema.js';
-import { loginSchema } from '../schemas/login.schema.js';
-import { refreshSchema } from '../schemas/refresh.schema.js';
-import { logoutSchema } from '../schemas/logout.schema.js';
+import { registerOrganizationSchema } from '#modules/auth/schemas/registration.schema.js';
+import { loginSchema } from '#modules/auth/schemas/login.schema.js';
+import { refreshSchema } from '#modules/auth/schemas/refresh.schema.js';
+import { logoutSchema } from '#modules/auth/schemas/logout.schema.js';
 
 import { authenticate } from '#middlewares/authenticate.middleware.js';
 
@@ -14,7 +14,7 @@ import {
     refreshToken,
     logout,
     logoutAllSessions
-} from '../controllers/auth.controller.js';
+} from '#modules/auth/controllers/auth.controller.js';
 
 
 const router: Router = Router();

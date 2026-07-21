@@ -2,15 +2,16 @@ import { z } from 'zod';
 
 export const registerOrganizationSchema = z.object({
 
-    organizationName: z
+    name: z
         .string()
         .trim()
         .min(3, 'Organization name must be at least 3 characters.')
-        .max(255),
+        .max(100),
 
-    organizationSlug: z
+    slug: z
         .string()
         .trim()
+        .toLowerCase()
         .min(3)
         .max(100)
         .regex(

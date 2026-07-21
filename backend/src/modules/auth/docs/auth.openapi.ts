@@ -57,8 +57,8 @@ export const authPaths = {
                             default: {
                                 summary: 'Organization Registration',
                                 value: {
-                                    organizationName: 'Acme Corporation',
-                                    organizationSlug: 'acme-corporation',
+                                    name: 'Acme Corporation',
+                                    slug: 'acme-corporation',
                                     firstName: 'John',
                                     middleName: 'Michael',
                                     lastName: 'Doe',

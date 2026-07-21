@@ -12,21 +12,21 @@
 export const RegisterOrganizationRequestSchema = {
     type: 'object',
     required: [
-        'organizationName',
-        'organizationSlug',
+        'name',
+        'slug',
         'ownerEmail',
         'password',
         'firstName',
         'lastName',
     ],
     properties: {
-        organizationName: {
+        name: {
             type: 'string',
             minLength: 3,
-            maxLength: 255,
+            maxLength: 100,
             description: 'Display name of the organization.',
         },
-        organizationSlug: {
+        slug: {
             type: 'string',
             minLength: 3,
             maxLength: 100,

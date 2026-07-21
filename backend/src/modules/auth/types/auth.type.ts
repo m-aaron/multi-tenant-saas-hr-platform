@@ -1,40 +1,6 @@
-import type { EmploymentStatus } from "../constants/auth.constant.js";
 import type { UserStatus } from "#modules/user/constants/user.constant.js";
 import type { RoleName } from "#modules/role/constants/role.constant.js";
-export interface CreateOrganizationInput {
-    name: string;
-    slug: string;
-}
 
-export interface CreateEmployeeInput {
-    organizationId: string;
-
-    employeeNumber: string;
-
-    firstName: string;
-    middleName?: string | undefined;
-    lastName: string;
-    nameExtension?: string | undefined;
-
-    jobTitle: string;
-
-    employmentStatus: EmploymentStatus;
-
-    hireDate: string;
-}
-
-export interface CreateUserInput {
-    employeeId: string;
-    organizationId: string;
-    roleId: string;
-
-    email: string;
-    passwordHash: string;
-}
-
-export interface CreateProfileInput {
-    userId: string;
-}
 
 export interface FindLoginUserInput {
     organizationSlug: string;

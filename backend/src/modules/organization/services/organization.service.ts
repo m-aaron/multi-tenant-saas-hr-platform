@@ -2,7 +2,7 @@ import { withTransaction } from "#databases/transaction.js";
 import { ForbiddenError } from "#shared/errors/forbidden-error.js";
 import { NotFoundError } from "#shared/errors/not-found-error.js";
 
-import { 
+import {
     findOrganizationById,
     updateOrganizationById 
 } from "../repositories/organization.repository.js";
@@ -46,7 +46,7 @@ export async function updateCurrentOrganization(
 
         const organization = await updateOrganizationById(
             client, 
-            input.organizationName,
+            input.name,
             organizationId
         );
 

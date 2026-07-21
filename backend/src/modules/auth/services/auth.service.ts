@@ -1,23 +1,29 @@
 import { withTransaction } from '#databases/transaction.js';
 
-import { 
-    createOrganization, 
-    seedDefaultRoles, 
-    findRoleByName, 
-    createEmployee,
-    createUser,
-    createProfile,
+import {
     findUserForLogin,
     revokeSession,
     revokeAllSessions
 } from '#modules/auth/repositories/auth.repository.js';
+
+import { 
+    findOrganizationByName,
+    createOrganization
+} from '#modules/organization/repositories/organization.repository.js';
+import { 
+    seedDefaultRoles, 
+    findRoleByName
+} from '#modules/role/repositories/role.repository.js';
+import { createEmployee } from '#modules/employee/repositories/employee.repository.js';
+import { createUser } from '#modules/user/repositories/user.repository.js'
+import { createProfile } from '#modules/profile/repositories/profile.repository.js'
 
 import type { RegisterOrganizationInput } from '../schemas/registration.schema.js'
 import type { LoginInput } from '../schemas/login.schema.js';
 
 import type { LoginResult, TokenPair } from '../types/auth.type.js';
 
-import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/employee.contant.js';
+import { OWNER_EMPLOYEE_DEFAULTS } from '#modules/employee/constants/employee.constant.js';
 
 import { hashPassword, verifyPassword } from '#shared/utils/password.util.js';
 import { today } from '#shared/utils/date.util.js';
@@ -44,51 +50,51 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
     
     await withTransaction(async (client) => {
 
-        const organizationId = await createOrganization(client, {
-            name: input.organizationName,
-            slug: input.organizationSlug,
-        });
+        const existingOrganization = await findOrganizationByName(client, input.name);
 
-        if (!organizationId) {
-            throw new ConflictError('Organization slug or email already exists.')
+        if (existingOrganization) {
+            throw new ConflictError('Organization name already exists.');
         }
 
-        await seedDefaultRoles(client, organizationId);
+        const organization = await createOrganization(client, {
+            name: input.name,
+            slug: input.slug,
+        });
 
-        const ownerRoleId = await findRoleByName(client, organizationId, OWNER_EMPLOYEE_DEFAULTS.jobTitle);
+        await seedDefaultRoles(client, organization.id);
+
+        const ownerRoleId = await findRoleByName(client, organization.id, OWNER_EMPLOYEE_DEFAULTS.jobTitle);
 
         if (!ownerRoleId) {
             throw new NotFoundError('Owner role not found.');
         }
 
-        const employeeNumber = await generateEmployeeNumber(client, organizationId);
+        const employeeNumber = await generateEmployeeNumber(client, organization.id);
 
-        const employeeId = await createEmployee(client, {
-            organizationId,
-            employeeNumber,
+        const employeeId = await createEmployee(client, organization.id, employeeNumber, {
             firstName: input.firstName,
             middleName: input.middleName,
             lastName: input.lastName,
             nameExtension: input.nameExtension,
             jobTitle: OWNER_EMPLOYEE_DEFAULTS.jobTitle,
             employmentStatus: OWNER_EMPLOYEE_DEFAULTS.employmentStatus,
-            hireDate: today()
+            hireDate: new Date(today())
         });
 
         const passwordHash = await hashPassword(input.password);
 
-        const userId = await createUser(client, {
+        const userId = await createUser(
+            client,
             employeeId,
-            organizationId,
-            roleId: ownerRoleId,
-            email: input.ownerEmail,
+            organization.id,
+            ownerRoleId,
+            {
+                email: input.ownerEmail
+            },
             passwordHash
-        });
+        );
 
-        await createProfile(client, {
-            userId
-        });
-
+        await createProfile(client, userId);
     });
 }
 
