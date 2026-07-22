@@ -61,4 +61,7 @@ export const createEmployeeSchema = z.object({
         departmentId: departmentIdSchema
 });
 
+export const updateEmployeeSchema = createEmployeeSchema.partial();
+
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
+export type UpdateEmployeeInput = z.infer<typeof updateEmployeeSchema>;

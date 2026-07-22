@@ -5,12 +5,13 @@ import { requireRole } from '#middlewares/require-role.middleware.js';
 
 import { validate } from '#shared/validation/validate.js';
 
-import { createEmployeeSchema } from '#modules/employee/schemas/employee.schema.js';
+import { createEmployeeSchema, updateEmployeeSchema } from '#modules/employee/schemas/employee.schema.js';
 
 import { 
     createEmployee,
     getEmployees,
-    getEmployeeById
+    getEmployeeById,
+    updateEmployee
 } from '#modules/employee/controllers/employee.controller.js';
 
 
@@ -36,6 +37,14 @@ router.post(
     requireRole('owner', 'administrator', 'hr_manager'),
     validate(createEmployeeSchema),
     createEmployee
+);
+
+router.patch(
+    '/:employeeId',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    validate(updateEmployeeSchema),
+    updateEmployee
 );
 
 export default router;

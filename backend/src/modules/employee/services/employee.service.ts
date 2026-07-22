@@ -1,12 +1,13 @@
 import { withTransaction } from '#databases/transaction.js';
 
 import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
-import type { CreateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
+import type { CreateEmployeeInput, UpdateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
 
 import { 
     createEmployee as insertEmployee,
     findEmployeesByOrganizationId,
-    findEmployeeById
+    findEmployeeById,
+    updateEmployee as updateEmployeeRepository
 } from '#modules/employee/repositories/employee.repository.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
 import { findDepartmentById } from '#modules/department/repositories/department.repository.js';
@@ -82,6 +83,46 @@ export async function getEmployeeById(
         }
 
         return employee;
+    });
+
+    return result;
+}
+
+
+// This service function updates an employee's details.
+export async function updateEmployee(
+    organizationId: string | undefined,
+    id: string,
+    input: UpdateEmployeeInput
+): Promise<EmployeeRow> {
+
+    if (!organizationId) {
+        throw new UnauthorizedError('Organization context missing.');
+    }
+
+    const result = await withTransaction(async (client) => {
+
+        const currentEmployee = await findEmployeeById(client, organizationId, id);
+
+        if (!currentEmployee) {
+            throw new NotFoundError('Employee not found.');
+        }
+
+        if (input.departmentId) {
+            const department = await findDepartmentById(client, organizationId, input.departmentId);
+
+            if (!department) {
+                throw new NotFoundError('Department not found.');
+            }
+        }
+
+        const updatedEmployee = await updateEmployeeRepository(client, organizationId, id, input);
+
+        if (!updatedEmployee) {
+            throw new NotFoundError('Employee not found.');
+        }
+
+        return updatedEmployee;
     });
 
     return result;
