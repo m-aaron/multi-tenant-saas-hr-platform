@@ -8,7 +8,8 @@ import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
 
 import { 
     createEmployee as createEmployeeService,
-    getEmployees as getEmployeesService
+    getEmployees as getEmployeesService,
+    getEmployeeById as getEmployeeByIdService
 } from '#modules/employee/services/employee.service.js';
 
 
@@ -40,6 +41,24 @@ export const getEmployees: RequestHandler = asyncHandler(async (request, respons
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
         message: 'Employees retrieved successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
+});
+
+
+// This controller function handles retrieving an employee by ID for the authenticated user's organization.
+export const getEmployeeById: RequestHandler = asyncHandler(async (request, response) => {
+
+    const organizationId = request.user?.organizationId;
+    const employeeId = request.params['employeeId'] as string;
+
+    const result = await getEmployeeByIdService(organizationId, employeeId);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'Employee retrieved successfully.',
         data: result
     };
 

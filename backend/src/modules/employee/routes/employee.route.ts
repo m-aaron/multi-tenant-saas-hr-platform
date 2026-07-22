@@ -9,7 +9,8 @@ import { createEmployeeSchema } from '#modules/employee/schemas/employee.schema.
 
 import { 
     createEmployee,
-    getEmployees
+    getEmployees,
+    getEmployeeById
 } from '#modules/employee/controllers/employee.controller.js';
 
 
@@ -20,6 +21,13 @@ router.get(
     authenticate,
     requireRole('owner', 'administrator', 'hr_manager'),
     getEmployees
+);
+
+router.get(
+    '/:employeeId',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    getEmployeeById
 );
 
 router.post(

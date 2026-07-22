@@ -128,3 +128,64 @@ export async function findEmployeesByOrganizationId(
         updatedAt: row.updated_at
     }));
 }
+
+
+// This function finds an employee in the database by unique identifier and organization ID, if active.
+export async function findEmployeeById(
+    client: PoolClient,
+    organizationId: string | undefined,
+    id: string
+): Promise<EmployeeRow | null> {
+
+    const query = `
+        SELECT 
+            id, 
+            organization_id, 
+            department_id, 
+            employee_number, 
+            first_name, 
+            middle_name, 
+            last_name, 
+            name_extension, 
+            job_title, 
+            employment_status, 
+            hire_date, 
+            created_at, 
+            updated_at
+        FROM employees
+        WHERE 
+            id = $1 
+            AND organization_id = $2
+            AND deleted_at IS NULL
+        LIMIT 1
+    `;
+
+    const values = [
+        id,
+        organizationId
+    ];
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        organizationId: row.organization_id,
+        departmentId: row.department_id,
+        employeeNumber: row.employee_number,
+        firstName: row.first_name,
+        middleName: row.middle_name,
+        lastName: row.last_name,
+        nameExtension: row.name_extension,
+        jobTitle: row.job_title,
+        employmentStatus: row.employment_status,
+        hireDate: row.hire_date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    };
+}

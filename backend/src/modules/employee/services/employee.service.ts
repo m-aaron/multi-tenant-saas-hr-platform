@@ -5,7 +5,8 @@ import type { CreateEmployeeInput } from '#modules/employee/schemas/employee.sch
 
 import { 
     createEmployee as insertEmployee,
-    findEmployeesByOrganizationId
+    findEmployeesByOrganizationId,
+    findEmployeeById
 } from '#modules/employee/repositories/employee.repository.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
 import { findDepartmentById } from '#modules/department/repositories/department.repository.js';
@@ -56,6 +57,31 @@ export async function getEmployees(
 
     const result = await withTransaction(async (client) => {
         return await findEmployeesByOrganizationId(client, organizationId);
+    });
+
+    return result;
+}
+
+
+// This service function retrieves an employee by ID.
+export async function getEmployeeById(
+    organizationId: string | undefined,
+    id: string
+): Promise<EmployeeRow | null> {
+
+    if (!organizationId) {
+        return null;
+    }
+
+    const result = await withTransaction(async (client) => {
+
+        const employee = await findEmployeeById(client, organizationId, id);
+
+        if (!employee) {
+            throw new NotFoundError('Employee not found.');
+        }
+
+        return employee;
     });
 
     return result;
