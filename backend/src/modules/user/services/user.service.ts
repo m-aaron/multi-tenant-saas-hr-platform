@@ -88,3 +88,24 @@ export async function getUsers(
 
     return result;
 }
+
+
+// This service function retrieves a user by ID.
+export async function getUserById(
+    organizationId: string,
+    id: string
+): Promise<UserRow | null> {
+
+    const result = await withTransaction(async (client) => {
+
+        const user = await findUserById(client, organizationId, id);
+
+        if (!user) {
+            throw new NotFoundError('User not found.');
+        }
+
+        return user;
+    });
+
+    return result;
+}

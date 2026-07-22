@@ -9,7 +9,8 @@ import { createUserSchema } from '#modules/user/schemas/user.schema.js';
 
 import { 
     createUser,
-    getUsers
+    getUsers,
+    getUserById
 } from '#modules/user/controllers/user.controller.js';
 
 
@@ -20,6 +21,13 @@ router.get(
     authenticate,
     requireRole('owner', 'administrator', 'hr_manager'),
     getUsers
+);
+
+router.get(
+    '/:userId',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    getUserById
 );
 
 router.post(
