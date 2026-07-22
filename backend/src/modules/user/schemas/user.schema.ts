@@ -31,6 +31,12 @@ export const createUserSchema = z.object({
     password: passwordSchema
 });
 
+export const inviteUserSchema = z.object({
+    employeeId: employeeIdSchema,
+    roleId: roleIdSchema,
+    email: emailSchema
+});
+
 export const updateUserSchema = createUserSchema
     .extend({
         status: userStatusSchema
@@ -38,4 +44,5 @@ export const updateUserSchema = createUserSchema
     .partial();
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type InviteUserInput = z.infer<typeof inviteUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;

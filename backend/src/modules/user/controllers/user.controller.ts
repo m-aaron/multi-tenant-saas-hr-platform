@@ -3,10 +3,11 @@ import type { RequestHandler } from 'express';
 import { asyncHandler } from '#shared/utils/async-handler.util.js';
 
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
-import type { CreateUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
+import type { CreateUserInput, InviteUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 
 import { 
     createUser as createUserService,
+    inviteUser as inviteUserService,
     getUsers as getUsersService,
     getUserById as getUserByIdService,
     updateUser as updateUserService,
@@ -25,6 +26,24 @@ export const createUser: RequestHandler = asyncHandler(async (request, response)
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
         message: 'User created successfully.',
+        data: result
+    };
+
+    response.status(201).json(responseBody);
+});
+
+
+// This controller function handles inviting a new user with no password for the authenticated user's organization.
+export const inviteUser: RequestHandler = asyncHandler(async (request, response) => {
+
+    const { organizationId } = request.user!;
+    const input: InviteUserInput = request.body;
+
+    const result = await inviteUserService(organizationId, input);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'User invited successfully.',
         data: result
     };
 

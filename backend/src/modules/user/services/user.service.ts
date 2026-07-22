@@ -1,7 +1,7 @@
 import { withTransaction } from '#databases/transaction.js';
 
 import type { UserRow } from '#modules/user/types/user.type.js';
-import type { CreateUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
+import type { CreateUserInput, InviteUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 import { USER_STATUS } from '#modules/user/constants/user.constant.js';
 
 import { 
@@ -62,7 +62,8 @@ export async function createUser(
             organizationId,
             input.roleId,
             input,
-            passwordHash
+            passwordHash,
+            USER_STATUS.ACTIVE
         );
 
         await createProfile(client, userId);
@@ -74,6 +75,63 @@ export async function createUser(
         }
 
         return createdUser;
+    });
+
+    return result;
+}
+
+
+// This service function invites a new user without a password (status: 'invited') in the authenticated user's organization.
+export async function inviteUser(
+    organizationId: string,
+    input: InviteUserInput
+): Promise<UserRow> {
+
+    const result = await withTransaction(async (client) => {
+
+        const employee = await findEmployeeById(client, organizationId, input.employeeId);
+
+        if (!employee) {
+            throw new NotFoundError('Employee not found.');
+        }
+
+        const existingUserForEmployee = await findUserByEmployeeId(client, organizationId, input.employeeId);
+
+        if (existingUserForEmployee) {
+            throw new ConflictError('Employee already has a user account.');
+        }
+
+        const role = await findRoleById(client, organizationId, input.roleId);
+
+        if (!role) {
+            throw new NotFoundError('Role not found.');
+        }
+
+        const existingUserEmail = await findUserByEmail(client, organizationId, input.email);
+
+        if (existingUserEmail) {
+            throw new ConflictError('User with this email already exists in this organization.');
+        }
+
+        const userId = await insertUser(
+            client,
+            input.employeeId,
+            organizationId,
+            input.roleId,
+            input,
+            null,
+            USER_STATUS.INVITED
+        );
+
+        await createProfile(client, userId);
+
+        const invitedUser = await findUserById(client, organizationId, userId);
+
+        if (!invitedUser) {
+            throw new NotFoundError('User not found.');
+        }
+
+        return invitedUser;
     });
 
     return result;

@@ -4,6 +4,8 @@ import { generateUuid } from '#shared/utils/uuid.util.js';
 import type { UserRow } from '#modules/user/types/user.type.js';
 import type { UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 
+import type { UserStatus } from '#modules/user/constants/user.constant.js';
+
 
 // This function creates a new user in the database and returns its unique identifier.
 export async function createUser(
@@ -12,7 +14,8 @@ export async function createUser(
     organizationId: string,
     roleId: string,
     input: { email: string },
-    passwordHash: string
+    passwordHash: string | null,
+    status: UserStatus = 'active'
 ): Promise<string> {
     
     const userId = generateUuid();
@@ -24,9 +27,10 @@ export async function createUser(
             organization_id, 
             role_id, 
             email, 
-            password_hash
+            password_hash,
+            status
         ) 
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
     const values = [
@@ -35,7 +39,8 @@ export async function createUser(
         organizationId,
         roleId,
         input.email,
-        passwordHash
+        passwordHash,
+        status
     ];
 
     await client.query(query, values);

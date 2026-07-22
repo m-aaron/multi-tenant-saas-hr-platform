@@ -6,7 +6,7 @@ CREATE TABLE users (
     role_id UUID NOT NULL,
 
     email VARCHAR(255) NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT,
 
     status VARCHAR(30) NOT NULL DEFAULT 'active',
 
