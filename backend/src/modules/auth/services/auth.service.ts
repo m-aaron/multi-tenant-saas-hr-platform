@@ -8,6 +8,7 @@ import {
 
 import { 
     findOrganizationByName,
+    findOrganizationBySlug,
     createOrganization
 } from '#modules/organization/repositories/organization.repository.js';
 import { 
@@ -50,10 +51,14 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
     
     await withTransaction(async (client) => {
 
-        const existingOrganization = await findOrganizationByName(client, input.name);
-
-        if (existingOrganization) {
+        const existingName = await findOrganizationByName(client, input.name);
+        if (existingName) {
             throw new ConflictError('Organization name already exists.');
+        }
+
+        const existingSlug = await findOrganizationBySlug(client, input.slug);
+        if (existingSlug) {
+            throw new ConflictError('Organization slug already exists.');
         }
 
         const organization = await createOrganization(client, {
@@ -71,7 +76,7 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
 
         const employeeNumber = await generateEmployeeNumber(client, organization.id);
 
-        const employeeId = await createEmployee(client, organization.id, employeeNumber, {
+        const employee = await createEmployee(client, organization.id, employeeNumber, {
             firstName: input.firstName,
             middleName: input.middleName,
             lastName: input.lastName,
@@ -85,7 +90,7 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
 
         const userId = await createUser(
             client,
-            employeeId,
+            employee.id,
             organization.id,
             ownerRoleId,
             {

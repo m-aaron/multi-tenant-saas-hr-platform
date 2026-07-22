@@ -8,6 +8,7 @@ import healthRouter from '#modules/health/routes/health.route.js';
 import authRouter from '#modules/auth/routes/auth.route.js';
 import organizationRouter from '#modules/organization/routes/organization.route.js'
 import departmentRouter from '#modules/department/routes/department.route.js';
+import employeeRouter from '#modules/employee/routes/employee.route.js';
 
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import { notFoundMiddleware } from './middlewares/not-found.middleware.js';
@@ -27,6 +28,7 @@ app.use(`${API_PREFIX}`, healthRouter); // Health check route
 app.use(`${API_PREFIX}/auth`, authRouter);
 app.use(`${API_PREFIX}/organizations`, organizationRouter);
 app.use(`${API_PREFIX}/departments`, departmentRouter);
+app.use(`${API_PREFIX}/employees`, employeeRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
