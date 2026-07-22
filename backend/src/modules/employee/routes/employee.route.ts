@@ -11,7 +11,8 @@ import {
     createEmployee,
     getEmployees,
     getEmployeeById,
-    updateEmployee
+    updateEmployee,
+    deleteEmployee
 } from '#modules/employee/controllers/employee.controller.js';
 
 
@@ -45,6 +46,13 @@ router.patch(
     requireRole('owner', 'administrator', 'hr_manager'),
     validate(updateEmployeeSchema),
     updateEmployee
+);
+
+router.delete(
+    '/:employeeId',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    deleteEmployee
 );
 
 export default router;

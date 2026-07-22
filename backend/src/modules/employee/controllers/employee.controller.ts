@@ -13,7 +13,8 @@ import {
     createEmployee as createEmployeeService,
     getEmployees as getEmployeesService,
     getEmployeeById as getEmployeeByIdService,
-    updateEmployee as updateEmployeeService
+    updateEmployee as updateEmployeeService,
+    deleteEmployee as deleteEmployeeService
 } from '#modules/employee/services/employee.service.js';
 
 
@@ -87,3 +88,22 @@ export const updateEmployee: RequestHandler = asyncHandler(async (request, respo
 
     response.status(200).json(responseBody);
 });
+
+
+// This controller function handles soft deleting an employee by ID for the authenticated user's organization.
+export const deleteEmployee: RequestHandler = asyncHandler(async (request, response) => {
+
+    const organizationId = request.user?.organizationId;
+    const employeeId = request.params['employeeId'] as string;
+
+    await deleteEmployeeService(organizationId, employeeId);
+
+    const responseBody: ApiSuccessResponse<null> = {
+        success: true,
+        message: 'Employee deleted successfully.',
+        data: null
+    };
+
+    response.status(200).json(responseBody);
+});
+

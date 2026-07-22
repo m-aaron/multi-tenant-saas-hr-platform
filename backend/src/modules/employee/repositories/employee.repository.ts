@@ -294,3 +294,33 @@ export async function updateEmployee(
         updatedAt: row.updated_at
     };
 }
+
+
+// This function soft deletes an employee by setting its deleted_at column to NOW().
+export async function softDeleteEmployee(
+    client: PoolClient,
+    organizationId: string,
+    id: string
+): Promise<boolean> {
+    
+    const query = `
+        UPDATE employees
+        SET 
+            deleted_at = NOW(),
+            updated_at = NOW()
+        WHERE 
+            id = $1 
+            AND organization_id = $2
+            AND deleted_at IS NULL
+        RETURNING id
+    `;
+
+    const values = [
+        id,
+        organizationId
+    ];
+
+    const result = await client.query(query, values);
+
+    return result.rows.length > 0;
+}

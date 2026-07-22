@@ -7,7 +7,8 @@ import {
     createEmployee as insertEmployee,
     findEmployeesByOrganizationId,
     findEmployeeById,
-    updateEmployee as updateEmployeeRepository
+    updateEmployee as updateEmployeeRepository,
+    softDeleteEmployee
 } from '#modules/employee/repositories/employee.repository.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
 import { findDepartmentById } from '#modules/department/repositories/department.repository.js';
@@ -127,3 +128,31 @@ export async function updateEmployee(
 
     return result;
 }
+
+
+// This service function soft deletes an employee.
+export async function deleteEmployee(
+    organizationId: string | undefined,
+    id: string
+): Promise<void> {
+
+    if (!organizationId) {
+        throw new UnauthorizedError('Organization context missing.');
+    }
+
+    await withTransaction(async (client) => {
+
+        const employee = await findEmployeeById(client, organizationId, id);
+
+        if (!employee) {
+            throw new NotFoundError('Employee not found.');
+        }
+
+        const deleted = await softDeleteEmployee(client, organizationId, id);
+
+        if (!deleted) {
+            throw new NotFoundError('Employee not found.');
+        }
+    });
+}
+
