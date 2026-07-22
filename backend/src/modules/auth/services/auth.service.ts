@@ -93,9 +93,7 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
             employee.id,
             organization.id,
             ownerRoleId,
-            {
-                email: input.ownerEmail
-            },
+            { email: input.ownerEmail },
             passwordHash
         );
 

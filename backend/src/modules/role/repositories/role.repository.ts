@@ -55,3 +55,31 @@ export async function findRoleByName(client: PoolClient, organizationId: string,
 
     return result.rows[0].id;
 }
+
+
+// This function finds a role by its ID within a specific organization.
+export async function findRoleById(client: PoolClient, organizationId: string, roleId: string): Promise<{ id: string; organizationId: string; name: string } | null> {
+
+    const result = await client.query(
+        `SELECT 
+            id, 
+            organization_id, 
+            name
+        FROM roles 
+        WHERE organization_id = $1 AND id = $2
+        LIMIT 1`,
+        [organizationId, roleId]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        organizationId: row.organization_id,
+        name: row.name
+    };
+}
