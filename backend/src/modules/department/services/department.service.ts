@@ -22,7 +22,7 @@ import {
 
 // This service function creates a new department for the user's organization.
 export async function createDepartment(
-    organizationId: string | undefined,
+    organizationId: string,
     input: CreateDepartmentInput
 ): Promise<DepartmentRow> {
     
@@ -46,7 +46,7 @@ export async function createDepartment(
 
 // This service function updates the department name.
 export async function updateDepartment(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string,
     input: UpdateDepartmentInput
 ): Promise<DepartmentRow> {
@@ -85,13 +85,9 @@ export async function updateDepartment(
 
 // This service function retrieves all active departments in a user's organization.
 export async function getDepartments(
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<DepartmentRow[]> {
     
-    if (!organizationId) {
-        return [];
-    }
-
     const result = await withTransaction(async (client) => {
         return await findDepartmentsByOrganizationId(client, organizationId);
     });
@@ -102,13 +98,9 @@ export async function getDepartments(
 
 // This service function retrieves a department by its ID.
 export async function getDepartmentById(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string
 ): Promise<DepartmentRow | null> {
-    
-    if (!organizationId) {
-        return null;
-    }
 
     const result = await withTransaction(async (client) => {
         
@@ -127,13 +119,9 @@ export async function getDepartmentById(
 
 // This service function soft deletes a department, first unlinking associated employees.
 export async function deleteDepartment(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string
 ): Promise<void> {
-
-    if (!organizationId) {
-        throw new NotFoundError('Department not found.');
-    }
 
     await withTransaction(async (client) => {
 

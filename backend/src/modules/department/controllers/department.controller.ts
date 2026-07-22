@@ -18,7 +18,7 @@ import {
 // This controller function handles creating a new department for the authenticated user's organization.
 export const createDepartment: RequestHandler = asyncHandler(async (request, response) => {
     
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const input: CreateDepartmentInput = request.body;
 
     const result = await createDepartmentService(organizationId, input);
@@ -36,7 +36,7 @@ export const createDepartment: RequestHandler = asyncHandler(async (request, res
 // This controller function handles updating a department's details for the authenticated user's organization.
 export const updateDepartment: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const departmentId = request.params['departmentId'] as string;
     const input: UpdateDepartmentInput = request.body;
 
@@ -55,7 +55,7 @@ export const updateDepartment: RequestHandler = asyncHandler(async (request, res
 // This controller function handles retrieving all departments for the authenticated user's organization.
 export const getDepartments: RequestHandler = asyncHandler(async (request, response) => {
     
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
 
     const result = await getDepartmentsService(organizationId);
 
@@ -72,7 +72,7 @@ export const getDepartments: RequestHandler = asyncHandler(async (request, respo
 // This controller function handles retrieving a department by its ID for the authenticated user's organization.
 export const getDepartmentById: RequestHandler = asyncHandler(async (request, response) => {
     
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const departmentId = request.params['departmentId'] as string;
 
     const result = await getDepartmentByIdService(organizationId, departmentId);
@@ -90,7 +90,7 @@ export const getDepartmentById: RequestHandler = asyncHandler(async (request, re
 // This controller function handles soft deleting a department by its ID for the authenticated user's organization.
 export const deleteDepartment: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const departmentId = request.params['departmentId'] as string;
 
     await deleteDepartmentService(organizationId, departmentId);

@@ -12,7 +12,7 @@ import type {
 // This function finds a department in the database by its name and organization ID, if active.
 export async function findDepartmentByName(
     client: PoolClient,
-    organizationId: string | undefined,
+    organizationId: string,
     input: CreateDepartmentInput
 ): Promise<DepartmentRow | null> {
     
@@ -101,7 +101,7 @@ export async function insertDepartment(
 // This function finds a department in the database by its unique identifier and organization ID, if active.
 export async function findDepartmentById(
     client: PoolClient,
-    organizationId: string | undefined,
+    organizationId: string,
     id: string
 ): Promise<DepartmentRow | null> {
     
@@ -192,7 +192,7 @@ export async function updateDepartmentName(
 // This function finds all active departments in the database for a specific organization.
 export async function findDepartmentsByOrganizationId(
     client: PoolClient,
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<DepartmentRow[]> {
     
     const query = `

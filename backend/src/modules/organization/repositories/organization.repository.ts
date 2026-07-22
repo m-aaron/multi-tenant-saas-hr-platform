@@ -124,7 +124,7 @@ export async function createOrganization(
 // This function finds an organization in the database by their unique identifier.
 export async function findOrganizationById(
     client: PoolClient, 
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<OrganizationRow | null> {
 
     const query = `
@@ -157,7 +157,7 @@ export async function findOrganizationById(
 export async function updateOrganizationById(
     client: PoolClient, 
     organizationName: string,
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<OrganizationRow | null> {
 
     const query = `

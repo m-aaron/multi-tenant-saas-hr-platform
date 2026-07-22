@@ -14,7 +14,7 @@ import {
 // This controller function handles the current organization.
 export const getCurrentOrganization: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
 
     const result = await getCurrentOrganizationService(organizationId);
 
@@ -31,7 +31,7 @@ export const getCurrentOrganization: RequestHandler = asyncHandler(async (reques
 // This controller function handles the updating organization information.
 export const updateCurrentOrganization: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const input: UpdateOrganizationInput = request.body;
 
     const result = await updateCurrentOrganizationService(input, organizationId);

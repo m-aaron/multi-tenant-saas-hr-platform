@@ -256,7 +256,7 @@ export async function logout(refreshToken: string): Promise<void> {
 
 
 // This service function handles the logout of a user from all active sessions.
-export async function logoutAllSessions(userId: string | undefined): Promise<void> {
+export async function logoutAllSessions(userId: string): Promise<void> {
     
     await withTransaction(async (client) => {
     

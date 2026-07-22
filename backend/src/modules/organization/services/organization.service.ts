@@ -14,7 +14,7 @@ import type { UpdateOrganizationInput } from "../schemas/organization.schema.js"
 
 // This service function handles the current organization and returns their organization information.
 export async function getCurrentOrganization(
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<OrganizationRow> {
 
     const result = await withTransaction(async (client) => {
@@ -39,16 +39,12 @@ export async function getCurrentOrganization(
 // This service function handles the updating organization and returns their updated information.
 export async function updateCurrentOrganization(
     input: UpdateOrganizationInput, 
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<OrganizationRow> {
 
     const result = await withTransaction(async (client) => {
 
-        const organization = await updateOrganizationById(
-            client, 
-            input.name,
-            organizationId
-        );
+        const organization = await updateOrganizationById(client, input.name, organizationId);
 
         if (!organization) {
             throw new NotFoundError('Organization not found.')
