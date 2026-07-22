@@ -11,7 +11,8 @@ import {
     createUser,
     getUsers,
     getUserById,
-    updateUser
+    updateUser,
+    activateUser
 } from '#modules/user/controllers/user.controller.js';
 
 
@@ -45,6 +46,13 @@ router.patch(
     requireRole('owner', 'administrator'),
     validate(updateUserSchema),
     updateUser
+);
+
+router.patch(
+    '/:userId/activate',
+    authenticate,
+    requireRole('owner', 'administrator'),
+    activateUser
 );
 
 export default router;

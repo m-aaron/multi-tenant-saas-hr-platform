@@ -9,7 +9,8 @@ import {
     createUser as createUserService,
     getUsers as getUsersService,
     getUserById as getUserByIdService,
-    updateUser as updateUserService
+    updateUser as updateUserService,
+    activateUser as activateUserService
 } from '#modules/user/services/user.service.js';
 
 
@@ -78,6 +79,24 @@ export const updateUser: RequestHandler = asyncHandler(async (request, response)
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
         message: 'User updated successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
+});
+
+
+// This controller function handles activating a user account for the authenticated user's organization.
+export const activateUser: RequestHandler = asyncHandler(async (request, response) => {
+
+    const { organizationId } = request.user!;
+    const userId = request.params['userId'] as string;
+
+    const result = await activateUserService(organizationId, userId);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'User account activated successfully.',
         data: result
     };
 

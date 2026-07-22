@@ -2,6 +2,7 @@ import { withTransaction } from '#databases/transaction.js';
 
 import type { UserRow } from '#modules/user/types/user.type.js';
 import type { CreateUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
+import { USER_STATUS } from '#modules/user/constants/user.constant.js';
 
 import { 
     createUser as insertUser,
@@ -9,7 +10,8 @@ import {
     findUserByEmail,
     findUserByEmployeeId,
     findUsersByOrganizationId,
-    updateUser as updateUserRepository
+    updateUser as updateUserRepository,
+    activateUser as activateUserRepository
 } from '#modules/user/repositories/user.repository.js';
 import { findEmployeeById } from '#modules/employee/repositories/employee.repository.js';
 import { findRoleById } from '#modules/role/repositories/role.repository.js';
@@ -156,6 +158,37 @@ export async function updateUser(
             input,
             passwordHash
         );
+
+        if (!updatedUser) {
+            throw new NotFoundError('User not found.');
+        }
+
+        return updatedUser;
+    });
+
+    return result;
+}
+
+
+// This service function activates a user account.
+export async function activateUser(
+    organizationId: string,
+    id: string
+): Promise<UserRow> {
+
+    const result = await withTransaction(async (client) => {
+
+        const currentUser = await findUserById(client, organizationId, id);
+
+        if (!currentUser) {
+            throw new NotFoundError('User not found.');
+        }
+
+        if (currentUser.status === USER_STATUS.ACTIVE) {
+            throw new ConflictError('User account is already active.');
+        }
+
+        const updatedUser = await activateUserRepository(client, organizationId, id);
 
         if (!updatedUser) {
             throw new NotFoundError('User not found.');

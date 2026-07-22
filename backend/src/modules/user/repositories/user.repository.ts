@@ -298,3 +298,56 @@ export async function updateUser(
         updatedAt: row.updated_at
     };
 }
+
+
+// This function updates an active user's status to active in the database.
+export async function activateUser(
+    client: PoolClient,
+    organizationId: string,
+    id: string
+): Promise<UserRow | null> {
+
+    const query = `
+        UPDATE users
+        SET 
+            status = 'active',
+            updated_at = NOW()
+        WHERE 
+            id = $1 
+            AND organization_id = $2 
+            AND deleted_at IS NULL
+        RETURNING 
+            id,
+            employee_id,
+            organization_id,
+            role_id,
+            email,
+            status,
+            created_at,
+            updated_at
+    `;
+
+    const values = [
+        id,
+        organizationId
+    ];
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        employeeId: row.employee_id,
+        organizationId: row.organization_id,
+        roleId: row.role_id,
+        email: row.email,
+        status: row.status,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    };
+}
