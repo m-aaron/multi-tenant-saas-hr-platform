@@ -7,10 +7,20 @@ import { validate } from '#shared/validation/validate.js';
 
 import { createEmployeeSchema } from '#modules/employee/schemas/employee.schema.js';
 
-import { createEmployee } from '#modules/employee/controllers/employee.controller.js';
+import { 
+    createEmployee,
+    getEmployees
+} from '#modules/employee/controllers/employee.controller.js';
 
 
 const router: Router = Router();
+
+router.get(
+    '/',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    getEmployees
+);
 
 router.post(
     '/',

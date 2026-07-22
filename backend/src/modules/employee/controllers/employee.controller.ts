@@ -6,7 +6,10 @@ import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { CreateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
 import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
 
-import { createEmployee as createEmployeeService } from '#modules/employee/services/employee.service.js';
+import { 
+    createEmployee as createEmployeeService,
+    getEmployees as getEmployeesService
+} from '#modules/employee/services/employee.service.js';
 
 
 // This controller function handles creating a new employee for the authenticated user's organization.
@@ -24,4 +27,21 @@ export const createEmployee: RequestHandler = asyncHandler(async (request, respo
     };
 
     response.status(201).json(responseBody);
+});
+
+
+// This controller function handles retrieving all employees for the authenticated user's organization.
+export const getEmployees: RequestHandler = asyncHandler(async (request, response) => {
+
+    const organizationId = request.user?.organizationId;
+
+    const result = await getEmployeesService(organizationId);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'Employees retrieved successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
 });

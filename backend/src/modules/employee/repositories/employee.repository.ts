@@ -80,3 +80,51 @@ export async function createEmployee(
         updatedAt: row.updated_at
     };
 }
+
+
+// This function finds all active employees in the database for a specific organization.
+export async function findEmployeesByOrganizationId(
+    client: PoolClient,
+    organizationId: string | undefined
+): Promise<EmployeeRow[]> {
+    
+    const query = `
+        SELECT 
+            id, 
+            organization_id, 
+            department_id, 
+            employee_number, 
+            first_name, 
+            middle_name, 
+            last_name, 
+            name_extension, 
+            job_title, 
+            employment_status, 
+            hire_date, 
+            created_at, 
+            updated_at
+        FROM employees
+        WHERE 
+            organization_id = $1 
+            AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    `;
+
+    const result = await client.query(query, [organizationId]);
+
+    return result.rows.map(row => ({
+        id: row.id,
+        organizationId: row.organization_id,
+        departmentId: row.department_id,
+        employeeNumber: row.employee_number,
+        firstName: row.first_name,
+        middleName: row.middle_name,
+        lastName: row.last_name,
+        nameExtension: row.name_extension,
+        jobTitle: row.job_title,
+        employmentStatus: row.employment_status,
+        hireDate: row.hire_date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    }));
+}

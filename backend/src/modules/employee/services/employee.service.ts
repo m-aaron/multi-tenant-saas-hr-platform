@@ -3,7 +3,10 @@ import { withTransaction } from '#databases/transaction.js';
 import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
 import type { CreateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
 
-import { createEmployee as insertEmployee } from '#modules/employee/repositories/employee.repository.js';
+import { 
+    createEmployee as insertEmployee,
+    findEmployeesByOrganizationId
+} from '#modules/employee/repositories/employee.repository.js';
 import { generateEmployeeNumber } from '#modules/employee/services/employee-number.service.js';
 import { findDepartmentById } from '#modules/department/repositories/department.repository.js';
 
@@ -36,6 +39,23 @@ export async function createEmployee(
         const employee = await insertEmployee(client, organizationId, employeeNumber, input);
 
         return employee;
+    });
+
+    return result;
+}
+
+
+// This service function retrieves all active employees in a user's organization.
+export async function getEmployees(
+    organizationId: string | undefined
+): Promise<EmployeeRow[]> {
+
+    if (!organizationId) {
+        return [];
+    }
+
+    const result = await withTransaction(async (client) => {
+        return await findEmployeesByOrganizationId(client, organizationId);
     });
 
     return result;
