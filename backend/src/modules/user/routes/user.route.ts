@@ -5,12 +5,13 @@ import { requireRole } from '#middlewares/require-role.middleware.js';
 
 import { validate } from '#shared/validation/validate.js';
 
-import { createUserSchema } from '#modules/user/schemas/user.schema.js';
+import { createUserSchema, updateUserSchema } from '#modules/user/schemas/user.schema.js';
 
 import { 
     createUser,
     getUsers,
-    getUserById
+    getUserById,
+    updateUser
 } from '#modules/user/controllers/user.controller.js';
 
 
@@ -36,6 +37,14 @@ router.post(
     requireRole('owner', 'administrator'),
     validate(createUserSchema),
     createUser
+);
+
+router.patch(
+    '/:userId',
+    authenticate,
+    requireRole('owner', 'administrator'),
+    validate(updateUserSchema),
+    updateUser
 );
 
 export default router;

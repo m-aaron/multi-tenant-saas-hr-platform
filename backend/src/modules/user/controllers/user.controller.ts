@@ -3,12 +3,13 @@ import type { RequestHandler } from 'express';
 import { asyncHandler } from '#shared/utils/async-handler.util.js';
 
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
-import type { CreateUserInput } from '#modules/user/schemas/user.schema.js';
+import type { CreateUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 
 import { 
     createUser as createUserService,
     getUsers as getUsersService,
-    getUserById as getUserByIdService
+    getUserById as getUserByIdService,
+    updateUser as updateUserService
 } from '#modules/user/services/user.service.js';
 
 
@@ -58,6 +59,25 @@ export const getUserById: RequestHandler = asyncHandler(async (request, response
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
         message: 'User retrieved successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
+});
+
+
+// This controller function handles updating a user's details for the authenticated user's organization.
+export const updateUser: RequestHandler = asyncHandler(async (request, response) => {
+
+    const { organizationId } = request.user!;
+    const userId = request.params['userId'] as string;
+    const input: UpdateUserInput = request.body;
+
+    const result = await updateUserService(organizationId, userId, input);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'User updated successfully.',
         data: result
     };
 

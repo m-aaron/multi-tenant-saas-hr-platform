@@ -2,6 +2,7 @@ import type { PoolClient } from 'pg';
 
 import { generateUuid } from '#shared/utils/uuid.util.js';
 import type { UserRow } from '#modules/user/types/user.type.js';
+import type { UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 
 
 // This function creates a new user in the database and returns its unique identifier.
@@ -216,4 +217,84 @@ export async function findUsersByOrganizationId(
         createdAt: row.created_at,
         updatedAt: row.updated_at
     }));
+}
+
+
+// This function updates an active user in the database with non-undefined input fields.
+export async function updateUser(
+    client: PoolClient,
+    organizationId: string,
+    id: string,
+    input: UpdateUserInput,
+    passwordHash?: string
+): Promise<UserRow | null> {
+
+    const setClauses: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
+
+    if (input.roleId !== undefined) {
+        setClauses.push(`role_id = $${paramIndex++}`);
+        values.push(input.roleId);
+    }
+    if (input.email !== undefined) {
+        setClauses.push(`email = $${paramIndex++}`);
+        values.push(input.email);
+    }
+    if (input.status !== undefined) {
+        setClauses.push(`status = $${paramIndex++}`);
+        values.push(input.status);
+    }
+    if (passwordHash !== undefined) {
+        setClauses.push(`password_hash = $${paramIndex++}`);
+        values.push(passwordHash);
+    }
+
+    if (setClauses.length === 0) {
+        return findUserById(client, organizationId, id);
+    }
+
+    setClauses.push(`updated_at = NOW()`);
+
+    const idParamIndex = paramIndex++;
+    const orgParamIndex = paramIndex++;
+
+    values.push(id, organizationId);
+
+    const query = `
+        UPDATE users
+        SET ${setClauses.join(', ')}
+        WHERE 
+            id = $${idParamIndex}
+            AND organization_id = $${orgParamIndex}
+            AND deleted_at IS NULL
+        RETURNING 
+            id,
+            employee_id,
+            organization_id,
+            role_id,
+            email,
+            status,
+            created_at,
+            updated_at
+    `;
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        employeeId: row.employee_id,
+        organizationId: row.organization_id,
+        roleId: row.role_id,
+        email: row.email,
+        status: row.status,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    };
 }

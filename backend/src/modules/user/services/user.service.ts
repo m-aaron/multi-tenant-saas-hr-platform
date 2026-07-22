@@ -1,14 +1,15 @@
 import { withTransaction } from '#databases/transaction.js';
 
 import type { UserRow } from '#modules/user/types/user.type.js';
-import type { CreateUserInput } from '#modules/user/schemas/user.schema.js';
+import type { CreateUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 
 import { 
     createUser as insertUser,
     findUserById,
     findUserByEmail,
     findUserByEmployeeId,
-    findUsersByOrganizationId
+    findUsersByOrganizationId,
+    updateUser as updateUserRepository
 } from '#modules/user/repositories/user.repository.js';
 import { findEmployeeById } from '#modules/employee/repositories/employee.repository.js';
 import { findRoleById } from '#modules/role/repositories/role.repository.js';
@@ -105,6 +106,62 @@ export async function getUserById(
         }
 
         return user;
+    });
+
+    return result;
+}
+
+
+// This service function updates a user's details.
+export async function updateUser(
+    organizationId: string,
+    id: string,
+    input: UpdateUserInput
+): Promise<UserRow> {
+
+    const result = await withTransaction(async (client) => {
+
+        const currentUser = await findUserById(client, organizationId, id);
+
+        if (!currentUser) {
+            throw new NotFoundError('User not found.');
+        }
+
+        if (input.roleId) {
+            const role = await findRoleById(client, organizationId, input.roleId);
+
+            if (!role) {
+                throw new NotFoundError('Role not found.');
+            }
+        }
+
+        if (input.email && input.email !== currentUser.email) {
+            const existingUserEmail = await findUserByEmail(client, organizationId, input.email);
+
+            if (existingUserEmail) {
+                throw new ConflictError('User with this email already exists in this organization.');
+            }
+        }
+
+        let passwordHash: string | undefined;
+
+        if (input.password) {
+            passwordHash = await hashPassword(input.password);
+        }
+
+        const updatedUser = await updateUserRepository(
+            client,
+            organizationId,
+            id,
+            input,
+            passwordHash
+        );
+
+        if (!updatedUser) {
+            throw new NotFoundError('User not found.');
+        }
+
+        return updatedUser;
     });
 
     return result;
