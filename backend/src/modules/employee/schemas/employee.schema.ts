@@ -47,7 +47,8 @@ const employeeDetailsFields = {
 
     hireDate: z
         .coerce
-        .date(),
+        .date()
+        .refine((date) => date <= new Date(), 'Hire date must not be in the future.')
 };
 
 const departmentIdSchema = z

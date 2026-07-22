@@ -14,18 +14,13 @@ import { generateEmployeeNumber } from '#modules/employee/services/employee-numb
 import { findDepartmentById } from '#modules/department/repositories/department.repository.js';
 
 import { NotFoundError } from '#shared/errors/not-found-error.js';
-import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 
 
 // This service function creates a new employee in the authenticated user's organization.
 export async function createEmployee(
-    organizationId: string | undefined,
+    organizationId: string,
     input: CreateEmployeeInput
 ): Promise<EmployeeRow> {
-
-    if (!organizationId) {
-        throw new UnauthorizedError('Organization context missing.');
-    }
 
     const result = await withTransaction(async (client) => {
 
@@ -50,12 +45,8 @@ export async function createEmployee(
 
 // This service function retrieves all active employees in a user's organization.
 export async function getEmployees(
-    organizationId: string | undefined
+    organizationId: string
 ): Promise<EmployeeRow[]> {
-
-    if (!organizationId) {
-        return [];
-    }
 
     const result = await withTransaction(async (client) => {
         return await findEmployeesByOrganizationId(client, organizationId);
@@ -67,13 +58,9 @@ export async function getEmployees(
 
 // This service function retrieves an employee by ID.
 export async function getEmployeeById(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string
 ): Promise<EmployeeRow | null> {
-
-    if (!organizationId) {
-        return null;
-    }
 
     const result = await withTransaction(async (client) => {
 
@@ -92,14 +79,10 @@ export async function getEmployeeById(
 
 // This service function updates an employee's details.
 export async function updateEmployee(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string,
     input: UpdateEmployeeInput
 ): Promise<EmployeeRow> {
-
-    if (!organizationId) {
-        throw new UnauthorizedError('Organization context missing.');
-    }
 
     const result = await withTransaction(async (client) => {
 
@@ -132,13 +115,9 @@ export async function updateEmployee(
 
 // This service function soft deletes an employee.
 export async function deleteEmployee(
-    organizationId: string | undefined,
+    organizationId: string,
     id: string
 ): Promise<void> {
-
-    if (!organizationId) {
-        throw new UnauthorizedError('Organization context missing.');
-    }
 
     await withTransaction(async (client) => {
 

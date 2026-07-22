@@ -21,7 +21,7 @@ import {
 // This controller function handles creating a new employee for the authenticated user's organization.
 export const createEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId as string;
+    const { organizationId } = request.user!;
     const input: CreateEmployeeInput = request.body;
 
     const result = await createEmployeeService(organizationId, input);
@@ -39,7 +39,7 @@ export const createEmployee: RequestHandler = asyncHandler(async (request, respo
 // This controller function handles retrieving all employees for the authenticated user's organization.
 export const getEmployees: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
 
     const result = await getEmployeesService(organizationId);
 
@@ -56,7 +56,7 @@ export const getEmployees: RequestHandler = asyncHandler(async (request, respons
 // This controller function handles retrieving an employee by ID for the authenticated user's organization.
 export const getEmployeeById: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const employeeId = request.params['employeeId'] as string;
 
     const result = await getEmployeeByIdService(organizationId, employeeId);
@@ -74,7 +74,7 @@ export const getEmployeeById: RequestHandler = asyncHandler(async (request, resp
 // This controller function handles updating an employee's details for the authenticated user's organization.
 export const updateEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const employeeId = request.params['employeeId'] as string;
     const input: UpdateEmployeeInput = request.body;
 
@@ -93,7 +93,7 @@ export const updateEmployee: RequestHandler = asyncHandler(async (request, respo
 // This controller function handles soft deleting an employee by ID for the authenticated user's organization.
 export const deleteEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const organizationId = request.user?.organizationId;
+    const { organizationId } = request.user!;
     const employeeId = request.params['employeeId'] as string;
 
     await deleteEmployeeService(organizationId, employeeId);

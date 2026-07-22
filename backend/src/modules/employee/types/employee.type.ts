@@ -1,3 +1,6 @@
+import type { EmploymentStatus } from "#modules/employee/constants/employee.constant.js";
+
+
 export interface EmployeeRow {
     id: string;
     organizationId: string;
@@ -8,7 +11,7 @@ export interface EmployeeRow {
     lastName: string;
     nameExtension: string | null;
     jobTitle: string;
-    employmentStatus: string;
+    employmentStatus: EmploymentStatus;
     hireDate: Date;
     createdAt: Date;
     updatedAt: Date;

@@ -3,6 +3,7 @@ import { securitySchemes } from './openapi.security.js';
 import { authPaths } from '#modules/auth/docs/auth.openapi.js';
 import { organizationPaths } from '#modules/organization/docs/organization.openapi.js';
 import { departmentPaths } from '#modules/department/docs/department.openapi.js';
+import { employeePaths } from '#modules/employee/docs/employee.openapi.js';
 
 
 export const openApiDocument = {
@@ -36,6 +37,10 @@ export const openApiDocument = {
             name: 'Department',
             description: 'Department settings and management.',
         },
+        {
+            name: 'Employee',
+            description: 'Employee management and profile operations.',
+        },
     ],
 
     components: {
@@ -46,5 +51,6 @@ export const openApiDocument = {
         ...authPaths,
         ...organizationPaths,
         ...departmentPaths,
+        ...employeePaths,
     },
 };
