@@ -7,7 +7,8 @@ import {
     createUser as insertUser,
     findUserById,
     findUserByEmail,
-    findUserByEmployeeId
+    findUserByEmployeeId,
+    findUsersByOrganizationId
 } from '#modules/user/repositories/user.repository.js';
 import { findEmployeeById } from '#modules/employee/repositories/employee.repository.js';
 import { findRoleById } from '#modules/role/repositories/role.repository.js';
@@ -70,6 +71,19 @@ export async function createUser(
         }
 
         return createdUser;
+    });
+
+    return result;
+}
+
+
+// This service function retrieves all active users in a user's organization.
+export async function getUsers(
+    organizationId: string
+): Promise<UserRow[]> {
+
+    const result = await withTransaction(async (client) => {
+        return await findUsersByOrganizationId(client, organizationId);
     });
 
     return result;

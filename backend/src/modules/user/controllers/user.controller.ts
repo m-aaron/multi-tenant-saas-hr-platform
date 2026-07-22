@@ -6,7 +6,8 @@ import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { CreateUserInput } from '#modules/user/schemas/user.schema.js';
 
 import { 
-    createUser as createUserService
+    createUser as createUserService,
+    getUsers as getUsersService
 } from '#modules/user/services/user.service.js';
 
 
@@ -25,4 +26,21 @@ export const createUser: RequestHandler = asyncHandler(async (request, response)
     };
 
     response.status(201).json(responseBody);
+});
+
+
+// This controller function handles retrieving all users for the authenticated user's organization.
+export const getUsers: RequestHandler = asyncHandler(async (request, response) => {
+
+    const { organizationId } = request.user!;
+
+    const result = await getUsersService(organizationId);
+
+    const responseBody: ApiSuccessResponse<typeof result> = {
+        success: true,
+        message: 'Users retrieved successfully.',
+        data: result
+    };
+
+    response.status(200).json(responseBody);
 });

@@ -179,3 +179,41 @@ export async function findUserByEmployeeId(
         updatedAt: row.updated_at
     };
 }
+
+
+// This function finds all active users in the database for a specific organization.
+export async function findUsersByOrganizationId(
+    client: PoolClient,
+    organizationId: string
+): Promise<UserRow[]> {
+
+    const query = `
+        SELECT 
+            id,
+            employee_id,
+            organization_id,
+            role_id,
+            email,
+            status,
+            created_at,
+            updated_at
+        FROM users
+        WHERE 
+            organization_id = $1 
+            AND deleted_at IS NULL
+        ORDER BY created_at DESC
+    `;
+
+    const result = await client.query(query, [organizationId]);
+
+    return result.rows.map((row) => ({
+        id: row.id,
+        employeeId: row.employee_id,
+        organizationId: row.organization_id,
+        roleId: row.role_id,
+        email: row.email,
+        status: row.status,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    }));
+}

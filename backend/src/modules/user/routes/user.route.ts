@@ -8,11 +8,19 @@ import { validate } from '#shared/validation/validate.js';
 import { createUserSchema } from '#modules/user/schemas/user.schema.js';
 
 import { 
-    createUser
+    createUser,
+    getUsers
 } from '#modules/user/controllers/user.controller.js';
 
 
 const router: Router = Router();
+
+router.get(
+    '/',
+    authenticate,
+    requireRole('owner', 'administrator', 'hr_manager'),
+    getUsers
+);
 
 router.post(
     '/',
