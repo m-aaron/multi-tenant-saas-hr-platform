@@ -7,9 +7,13 @@ export async function hashPassword(password: string,): Promise<string> {
     });
 }
 
-export async function verifyPassword(hash: string, password: string,): Promise<boolean> {
+export async function verifyPassword(hash: string | null | undefined, password: string): Promise<boolean> {
+    if (!hash) {
+        return false;
+    }
+
     return argon2.verify(
         hash,
-        password,
+        password
     );
 }

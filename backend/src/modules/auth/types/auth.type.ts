@@ -8,13 +8,13 @@ export interface FindLoginUserInput {
 }
 
 export interface UserLoginRow {
-    id: string,
-    employeeId: string,
-    organizationId: string,
-    roleId: string,
-    email: string,
-    passwordHash: string,
-    status: UserStatus
+    id: string;
+    employeeId: string;
+    organizationId: string;
+    roleId: string;
+    email: string;
+    passwordHash: string | null;
+    status: UserStatus;
 }
 
 export interface LoginResult {

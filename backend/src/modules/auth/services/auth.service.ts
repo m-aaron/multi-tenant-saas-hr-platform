@@ -114,7 +114,7 @@ export async function login(input: LoginInput): Promise<LoginResult> {
             }
         );
 
-        if (!user) {
+        if (!user || !user.passwordHash) {
             throw new UnauthorizedError('Invalid credentials.');
         }
 
