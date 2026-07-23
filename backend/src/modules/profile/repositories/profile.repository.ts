@@ -2,7 +2,8 @@ import type { PoolClient } from 'pg';
 
 import { generateUuid } from '#shared/utils/uuid.util.js';
 
-import type { ProfileDetails } from '#modules/profile/types/profile.type.js';
+import type { ProfileDetails, ProfileRow } from '#modules/profile/types/profile.type.js';
+import type { UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
 
 
 // This function creates a new profile in the database for a given user.
@@ -142,5 +143,87 @@ export async function findProfileByUserId(
             createdAt: row.employee_created_at,
             updatedAt: row.employee_updated_at
         }
+    };
+}
+
+
+// This function updates a profile in the database with non-undefined input fields and returns the updated row.
+export async function updateProfile(
+    client: PoolClient,
+    userId: string,
+    input: UpdateProfileInput
+): Promise<ProfileRow | null> {
+
+    const setClauses: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
+
+    if (input.avatarUrl !== undefined) {
+        setClauses.push(`avatar_url = $${paramIndex++}`);
+        values.push(input.avatarUrl);
+    }
+
+    if (setClauses.length === 0) {
+        const query = `
+            SELECT
+                id,
+                user_id,
+                avatar_url,
+                created_at,
+                updated_at
+            FROM profiles
+            WHERE user_id = $1
+            LIMIT 1
+        `;
+
+        const result = await client.query(query, [userId]);
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        const row = result.rows[0];
+
+        return {
+            id: row.id,
+            userId: row.user_id,
+            avatarUrl: row.avatar_url,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
+        };
+    }
+
+    setClauses.push(`updated_at = NOW()`);
+
+    const userIdParamIndex = paramIndex++;
+
+    values.push(userId);
+
+    const query = `
+        UPDATE profiles
+        SET ${setClauses.join(', ')}
+        WHERE user_id = $${userIdParamIndex}
+        RETURNING
+            id,
+            user_id,
+            avatar_url,
+            created_at,
+            updated_at
+    `;
+
+    const result = await client.query(query, values);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        userId: row.user_id,
+        avatarUrl: row.avatar_url,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
     };
 }

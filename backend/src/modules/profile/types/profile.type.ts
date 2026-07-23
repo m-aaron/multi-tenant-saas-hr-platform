@@ -1,5 +1,13 @@
 import type { EmploymentStatus } from "#modules/employee/constants/employee.constant.js";
 
+export interface ProfileRow {
+    id: string;
+    userId: string;
+    avatarUrl: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 interface Profile {
     profileId: string;
     avatarUrl: string | null;
