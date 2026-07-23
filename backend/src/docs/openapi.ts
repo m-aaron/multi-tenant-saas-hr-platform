@@ -5,6 +5,7 @@ import { organizationPaths } from '#modules/organization/docs/organization.opena
 import { departmentPaths } from '#modules/department/docs/department.openapi.js';
 import { employeePaths } from '#modules/employee/docs/employee.openapi.js';
 import { userPaths } from '#modules/user/docs/user.openapi.js';
+import { profilePaths } from '#modules/profile/docs/profile.openapi.js';
 
 
 export const openApiDocument = {
@@ -46,6 +47,10 @@ export const openApiDocument = {
             name: 'User',
             description: 'User account creation, invitations, updates and status management.',
         },
+        {
+            name: 'Profile',
+            description: 'Authenticated user profile retrieval, updates and password management.',
+        },
     ],
 
     components: {
@@ -58,5 +63,6 @@ export const openApiDocument = {
         ...departmentPaths,
         ...employeePaths,
         ...userPaths,
+        ...profilePaths,
     },
 };

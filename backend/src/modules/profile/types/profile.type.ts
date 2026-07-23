@@ -1,4 +1,5 @@
-import type { EmploymentStatus } from "#modules/employee/constants/employee.constant.js";
+import type { EmploymentStatus } from '#modules/employee/constants/employee.constant.js';
+import type { UserStatus } from '#modules/user/constants/user.constant.js';
 
 export interface ProfileRow {
     id: string;
@@ -31,7 +32,7 @@ interface Role {
 interface User {
     userId: string;
     email: string;
-    status: string;
+    status: UserStatus;
     createdAt: Date;
     updatedAt: Date;
 }
