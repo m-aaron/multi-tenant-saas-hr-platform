@@ -95,6 +95,54 @@ export async function findUserById(
 }
 
 
+// This function finds an active user with their password hash by ID and organization ID.
+export async function findUserWithPasswordHashById(
+    client: PoolClient,
+    organizationId: string,
+    id: string
+): Promise<(UserRow & { passwordHash: string | null }) | null> {
+
+    const query = `
+        SELECT 
+            id,
+            employee_id,
+            organization_id,
+            role_id,
+            email,
+            password_hash,
+            status,
+            created_at,
+            updated_at
+        FROM users
+        WHERE 
+            organization_id = $1 
+            AND id = $2 
+            AND deleted_at IS NULL
+        LIMIT 1
+    `;
+
+    const result = await client.query(query, [organizationId, id]);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+        id: row.id,
+        employeeId: row.employee_id,
+        organizationId: row.organization_id,
+        roleId: row.role_id,
+        email: row.email,
+        passwordHash: row.password_hash,
+        status: row.status,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+    };
+}
+
+
 // This function finds an active user in the database by email and organization ID.
 export async function findUserByEmail(
     client: PoolClient,

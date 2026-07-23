@@ -4,11 +4,12 @@ import { authenticate } from '#middlewares/authenticate.middleware.js';
 
 import { validate } from '#shared/validation/validate.js';
 
-import { updateProfileSchema } from '#modules/profile/schemas/profile.schema.js';
+import { updatePasswordSchema, updateProfileSchema } from '#modules/profile/schemas/profile.schema.js';
 
 import {
     getProfile,
-    updateProfile
+    updateProfile,
+    updatePassword
 } from '#modules/profile/controllers/profile.controller.js';
 
 
@@ -25,6 +26,13 @@ router.patch(
     authenticate,
     validate(updateProfileSchema),
     updateProfile
+);
+
+router.patch(
+    '/password',
+    authenticate,
+    validate(updatePasswordSchema),
+    updatePassword
 );
 
 export default router;

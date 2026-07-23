@@ -1,13 +1,16 @@
 import { withTransaction } from '#databases/transaction.js';
 
 import type { ProfileDetails, ProfileRow } from '#modules/profile/types/profile.type.js';
-import type { UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
+import type { UpdatePasswordInput, UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
 
 import {
     findProfileByUserId,
     updateProfile as updateProfileRepository
 } from '#modules/profile/repositories/profile.repository.js';
+import { findUserWithPasswordHashById, updateUser } from '#modules/user/repositories/user.repository.js';
 
+import { hashPassword, verifyPassword } from '#shared/utils/password.util.js';
+import { UnauthorizedError } from '#shared/errors/unauthorized-error.js';
 import { NotFoundError } from '#shared/errors/not-found-error.js';
 
 
@@ -55,4 +58,47 @@ export async function updateProfile(
     });
 
     return result;
+}
+
+
+// This service function updates the authenticated user's password.
+export async function updatePassword(
+    userId: string,
+    input: UpdatePasswordInput
+): Promise<void> {
+
+    await withTransaction(async (client) => {
+
+        const profile = await findProfileByUserId(client, userId);
+
+        if (!profile) {
+            throw new NotFoundError('Profile not found.');
+        }
+
+        const user = await findUserWithPasswordHashById(client, profile.organization.organizationId, userId);
+
+        if (!user) {
+            throw new NotFoundError('User not found.');
+        }
+
+        const isCurrentPasswordValid = await verifyPassword(user.passwordHash ?? null, input.currentPassword);
+
+        if (!isCurrentPasswordValid) {
+            throw new UnauthorizedError('Current password is incorrect.');
+        }
+
+        const newPasswordHash = await hashPassword(input.newPassword);
+
+        const updatedUser = await updateUser(
+            client,
+            profile.organization.organizationId,
+            userId,
+            {},
+            newPasswordHash
+        );
+
+        if (!updatedUser) {
+            throw new NotFoundError('User not found.');
+        }
+    });
 }

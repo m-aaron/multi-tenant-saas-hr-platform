@@ -4,11 +4,12 @@ import { asyncHandler } from '#shared/utils/async-handler.util.js';
 
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 import type { ProfileDetails, ProfileRow } from '#modules/profile/types/profile.type.js';
-import type { UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
+import type { UpdatePasswordInput, UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
 
 import {
     getProfile as getProfileService,
-    updateProfile as updateProfileService
+    updateProfile as updateProfileService,
+    updatePassword as updatePasswordService
 } from '#modules/profile/services/profile.service.js';
 
 
@@ -41,6 +42,24 @@ export const updateProfile: RequestHandler = asyncHandler(async (request, respon
         success: true,
         message: 'Profile updated successfully.',
         data: result
+    };
+
+    response.status(200).json(responseBody);
+});
+
+
+// This controller function handles updating the authenticated user's password.
+export const updatePassword: RequestHandler = asyncHandler(async (request, response) => {
+
+    const { id } = request.user!;
+    const input: UpdatePasswordInput = request.body;
+
+    await updatePasswordService(id, input);
+
+    const responseBody: ApiSuccessResponse<null> = {
+        success: true,
+        message: 'Password updated successfully.',
+        data: null
     };
 
     response.status(200).json(responseBody);
