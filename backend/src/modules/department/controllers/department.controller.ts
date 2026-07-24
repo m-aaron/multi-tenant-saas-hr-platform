@@ -18,10 +18,10 @@ import {
 // This controller function handles creating a new department for the authenticated user's organization.
 export const createDepartment: RequestHandler = asyncHandler(async (request, response) => {
     
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const input: CreateDepartmentInput = request.body;
 
-    const result = await createDepartmentService(organizationId, input);
+    const result = await createDepartmentService(organizationId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -36,11 +36,11 @@ export const createDepartment: RequestHandler = asyncHandler(async (request, res
 // This controller function handles updating a department's details for the authenticated user's organization.
 export const updateDepartment: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const departmentId = request.params['departmentId'] as string;
     const input: UpdateDepartmentInput = request.body;
 
-    const result = await updateDepartmentService(organizationId, departmentId, input);
+    const result = await updateDepartmentService(organizationId, departmentId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -90,10 +90,10 @@ export const getDepartmentById: RequestHandler = asyncHandler(async (request, re
 // This controller function handles soft deleting a department by its ID for the authenticated user's organization.
 export const deleteDepartment: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const departmentId = request.params['departmentId'] as string;
 
-    await deleteDepartmentService(organizationId, departmentId);
+    await deleteDepartmentService(organizationId, departmentId, actorId);
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,

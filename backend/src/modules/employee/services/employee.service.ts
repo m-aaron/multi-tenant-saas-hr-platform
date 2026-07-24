@@ -3,6 +3,8 @@ import { withTransaction } from '#databases/transaction.js';
 import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
 import type { CreateEmployeeInput, UpdateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
 
+import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+
 import { 
     createEmployee as insertEmployee,
     findEmployeesByOrganizationId,
@@ -19,6 +21,7 @@ import { NotFoundError } from '#shared/errors/not-found-error.js';
 // This service function creates a new employee in the authenticated user's organization.
 export async function createEmployee(
     organizationId: string,
+    actorId: string,
     input: CreateEmployeeInput
 ): Promise<EmployeeRow> {
 
@@ -35,6 +38,16 @@ export async function createEmployee(
         const employeeNumber = await generateEmployeeNumber(client, organizationId);
 
         const employee = await insertEmployee(client, organizationId, employeeNumber, input);
+
+        await ActivityLogService.logEmployeeCreated(
+            { organizationId, actorId, client },
+            { 
+                employeeId: employee.id,
+                employeeNumber: employee.employeeNumber,
+                firstName: employee.firstName,
+                lastName: employee.lastName
+            }
+        );
 
         return employee;
     });
@@ -81,6 +94,7 @@ export async function getEmployeeById(
 export async function updateEmployee(
     organizationId: string,
     id: string,
+    actorId: string,
     input: UpdateEmployeeInput
 ): Promise<EmployeeRow> {
 
@@ -106,6 +120,11 @@ export async function updateEmployee(
             throw new NotFoundError('Employee not found.');
         }
 
+        await ActivityLogService.logEmployeeUpdated(
+            { organizationId, actorId, client },
+            { employeeId: updatedEmployee.id }
+        );
+
         return updatedEmployee;
     });
 
@@ -116,7 +135,8 @@ export async function updateEmployee(
 // This service function soft deletes an employee.
 export async function deleteEmployee(
     organizationId: string,
-    id: string
+    id: string,
+    actorId: string
 ): Promise<void> {
 
     await withTransaction(async (client) => {
@@ -132,6 +152,11 @@ export async function deleteEmployee(
         if (!deleted) {
             throw new NotFoundError('Employee not found.');
         }
+
+        await ActivityLogService.logEmployeeArchived(
+            { organizationId, actorId, client },
+            { employeeId: employee.id }
+        );
     });
 }
 

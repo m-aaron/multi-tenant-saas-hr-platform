@@ -9,6 +9,8 @@ import type {
 import { ConflictError } from "#shared/errors/conflict-error.js";
 import { NotFoundError } from "#shared/errors/not-found-error.js";
 
+import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+
 import { 
     findDepartmentByName, 
     insertDepartment,
@@ -23,6 +25,7 @@ import {
 // This service function creates a new department for the user's organization.
 export async function createDepartment(
     organizationId: string,
+    actorId: string,
     input: CreateDepartmentInput
 ): Promise<DepartmentRow> {
     
@@ -37,6 +40,11 @@ export async function createDepartment(
 
         const department =  await insertDepartment(client, organizationId, input);
 
+        await ActivityLogService.logDepartmentCreated(
+            { organizationId, actorId, client },
+            { departmentId: department.id, name: department.name }
+        );
+
         return department;
     });
 
@@ -48,6 +56,7 @@ export async function createDepartment(
 export async function updateDepartment(
     organizationId: string,
     id: string,
+    actorId: string,
     input: UpdateDepartmentInput
 ): Promise<DepartmentRow> {
 
@@ -75,6 +84,11 @@ export async function updateDepartment(
         if (!updatedDepartment) {
             throw new NotFoundError('Department not found.');
         }
+
+        await ActivityLogService.logDepartmentUpdated(
+            { organizationId, actorId, client },
+            { departmentId: updatedDepartment.id, name: updatedDepartment.name }
+        );
 
         return updatedDepartment;
     });
@@ -120,7 +134,8 @@ export async function getDepartmentById(
 // This service function soft deletes a department, first unlinking associated employees.
 export async function deleteDepartment(
     organizationId: string,
-    id: string
+    id: string,
+    actorId: string
 ): Promise<void> {
 
     await withTransaction(async (client) => {
@@ -140,5 +155,10 @@ export async function deleteDepartment(
         if (!deleted) {
             throw new NotFoundError('Department not found.');
         }
+
+        await ActivityLogService.logDepartmentArchived(
+            { organizationId, actorId, client },
+            { departmentId: department.id, name: department.name }
+        );
     });
 }

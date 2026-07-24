@@ -33,10 +33,10 @@ export const getProfile: RequestHandler = asyncHandler(async (request, response)
 // This controller function handles updating the profile of the authenticated user.
 export const updateProfile: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { id } = request.user!;
+    const { id: actorId } = request.user!;
     const input: UpdateProfileInput = request.body;
 
-    const result = await updateProfileService(id, input);
+    const result = await updateProfileService(actorId, actorId, input);
 
     const responseBody: ApiSuccessResponse<ProfileRow> = {
         success: true,
@@ -51,10 +51,10 @@ export const updateProfile: RequestHandler = asyncHandler(async (request, respon
 // This controller function handles updating the authenticated user's password.
 export const updatePassword: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { id } = request.user!;
+    const { id: actorId } = request.user!;
     const input: UpdatePasswordInput = request.body;
 
-    await updatePasswordService(id, input);
+    await updatePasswordService(actorId, actorId, input);
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,

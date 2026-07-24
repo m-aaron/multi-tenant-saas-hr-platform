@@ -3,6 +3,8 @@ import { withTransaction } from '#databases/transaction.js';
 import type { ProfileDetails, ProfileRow } from '#modules/profile/types/profile.type.js';
 import type { UpdatePasswordInput, UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
 
+import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+
 import {
     findProfileByUserId,
     updateProfile as updateProfileRepository
@@ -37,6 +39,7 @@ export async function getProfile(
 // This service function updates the profile of the authenticated user.
 export async function updateProfile(
     userId: string,
+    actorId: string,
     input: UpdateProfileInput
 ): Promise<ProfileRow> {
 
@@ -54,6 +57,11 @@ export async function updateProfile(
             throw new NotFoundError('Profile not found.');
         }
 
+        await ActivityLogService.logProfileUpdated(
+            { organizationId: currentProfile.organization.organizationId, actorId, client },
+            { userId: updatedProfile.userId }
+        );
+
         return updatedProfile;
     });
 
@@ -64,6 +72,7 @@ export async function updateProfile(
 // This service function updates the authenticated user's password.
 export async function updatePassword(
     userId: string,
+    actorId: string,
     input: UpdatePasswordInput
 ): Promise<void> {
 
@@ -100,5 +109,10 @@ export async function updatePassword(
         if (!updatedUser) {
             throw new NotFoundError('User not found.');
         }
+
+        await ActivityLogService.logProfilePasswordChanged(
+            { organizationId: profile.organization.organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
     });
 }

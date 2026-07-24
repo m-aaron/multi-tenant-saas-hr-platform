@@ -21,10 +21,10 @@ import {
 // This controller function handles creating a new employee for the authenticated user's organization.
 export const createEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const input: CreateEmployeeInput = request.body;
 
-    const result = await createEmployeeService(organizationId, input);
+    const result = await createEmployeeService(organizationId, actorId, input);
 
     const responseBody: ApiSuccessResponse<EmployeeRow> = {
         success: true,
@@ -74,11 +74,11 @@ export const getEmployeeById: RequestHandler = asyncHandler(async (request, resp
 // This controller function handles updating an employee's details for the authenticated user's organization.
 export const updateEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const employeeId = request.params['employeeId'] as string;
     const input: UpdateEmployeeInput = request.body;
 
-    const result = await updateEmployeeService(organizationId, employeeId, input);
+    const result = await updateEmployeeService(organizationId, employeeId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -93,10 +93,10 @@ export const updateEmployee: RequestHandler = asyncHandler(async (request, respo
 // This controller function handles soft deleting an employee by ID for the authenticated user's organization.
 export const deleteEmployee: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const employeeId = request.params['employeeId'] as string;
 
-    await deleteEmployeeService(organizationId, employeeId);
+    await deleteEmployeeService(organizationId, employeeId, actorId);
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,

@@ -4,6 +4,8 @@ import type { UserRow } from '#modules/user/types/user.type.js';
 import type { CreateUserInput, InviteUserInput, UpdateUserInput } from '#modules/user/schemas/user.schema.js';
 import { USER_STATUS } from '#modules/user/constants/user.constant.js';
 
+import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+
 import { 
     createUser as insertUser,
     findUserById,
@@ -25,6 +27,7 @@ import { NotFoundError } from '#shared/errors/not-found-error.js';
 // This service function creates a new user in the authenticated user's organization.
 export async function createUser(
     organizationId: string,
+    actorId: string,
     input: CreateUserInput
 ): Promise<UserRow> {
 
@@ -74,6 +77,11 @@ export async function createUser(
             throw new NotFoundError('User not found.');
         }
 
+        await ActivityLogService.logUserCreated(
+            { organizationId, actorId, client },
+            { userId: createdUser.id, email: createdUser.email }
+        );
+
         return createdUser;
     });
 
@@ -84,6 +92,7 @@ export async function createUser(
 // This service function invites a new user without a password (status: 'invited') in the authenticated user's organization.
 export async function inviteUser(
     organizationId: string,
+    actorId: string,
     input: InviteUserInput
 ): Promise<UserRow> {
 
@@ -131,6 +140,11 @@ export async function inviteUser(
             throw new NotFoundError('User not found.');
         }
 
+        await ActivityLogService.logUserInvited(
+            { organizationId, actorId, client },
+            { userId: invitedUser.id, email: invitedUser.email }
+        );
+
         return invitedUser;
     });
 
@@ -176,6 +190,7 @@ export async function getUserById(
 export async function updateUser(
     organizationId: string,
     id: string,
+    actorId: string,
     input: UpdateUserInput
 ): Promise<UserRow> {
 
@@ -221,6 +236,11 @@ export async function updateUser(
             throw new NotFoundError('User not found.');
         }
 
+        await ActivityLogService.logUserUpdated(
+            { organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
+
         return updatedUser;
     });
 
@@ -231,7 +251,8 @@ export async function updateUser(
 // This service function activates a user account.
 export async function activateUser(
     organizationId: string,
-    id: string
+    id: string,
+    actorId: string
 ): Promise<UserRow> {
 
     const result = await withTransaction(async (client) => {
@@ -251,6 +272,11 @@ export async function activateUser(
         if (!updatedUser) {
             throw new NotFoundError('User not found.');
         }
+
+        await ActivityLogService.logUserReactivated(
+            { organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
 
         return updatedUser;
     });

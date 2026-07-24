@@ -18,10 +18,10 @@ import {
 // This controller function handles creating a new user for the authenticated user's organization.
 export const createUser: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const input: CreateUserInput = request.body;
 
-    const result = await createUserService(organizationId, input);
+    const result = await createUserService(organizationId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -36,10 +36,10 @@ export const createUser: RequestHandler = asyncHandler(async (request, response)
 // This controller function handles inviting a new user with no password for the authenticated user's organization.
 export const inviteUser: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const input: InviteUserInput = request.body;
 
-    const result = await inviteUserService(organizationId, input);
+    const result = await inviteUserService(organizationId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -89,11 +89,11 @@ export const getUserById: RequestHandler = asyncHandler(async (request, response
 // This controller function handles updating a user's details for the authenticated user's organization.
 export const updateUser: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const userId = request.params['userId'] as string;
     const input: UpdateUserInput = request.body;
 
-    const result = await updateUserService(organizationId, userId, input);
+    const result = await updateUserService(organizationId, userId, actorId, input);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
@@ -108,10 +108,10 @@ export const updateUser: RequestHandler = asyncHandler(async (request, response)
 // This controller function handles activating a user account for the authenticated user's organization.
 export const activateUser: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId } = request.user!;
+    const { organizationId, id: actorId } = request.user!;
     const userId = request.params['userId'] as string;
 
-    const result = await activateUserService(organizationId, userId);
+    const result = await activateUserService(organizationId, userId, actorId);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,
