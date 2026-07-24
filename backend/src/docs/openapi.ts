@@ -6,6 +6,7 @@ import { departmentPaths } from '#modules/department/docs/department.openapi.js'
 import { employeePaths } from '#modules/employee/docs/employee.openapi.js';
 import { userPaths } from '#modules/user/docs/user.openapi.js';
 import { profilePaths } from '#modules/profile/docs/profile.openapi.js';
+import { activityPaths } from '#modules/activity/docs/activity.openapi.js';
 
 
 export const openApiDocument = {
@@ -51,6 +52,10 @@ export const openApiDocument = {
             name: 'Profile',
             description: 'Authenticated user profile retrieval, updates and password management.',
         },
+        {
+            name: 'Activity',
+            description: 'Audit trail of business events (organization, department, employee, user, and profile changes).',
+        },
     ],
 
     components: {
@@ -64,5 +69,6 @@ export const openApiDocument = {
         ...employeePaths,
         ...userPaths,
         ...profilePaths,
+        ...activityPaths,
     },
 };
