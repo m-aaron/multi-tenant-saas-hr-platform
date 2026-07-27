@@ -7,6 +7,7 @@ import { employeePaths } from '#modules/employee/docs/employee.openapi.js';
 import { userPaths } from '#modules/user/docs/user.openapi.js';
 import { profilePaths } from '#modules/profile/docs/profile.openapi.js';
 import { activityPaths } from '#modules/activity/docs/activity.openapi.js';
+import { auditPaths } from '#modules/audit/docs/audit.openapi.js';
 
 
 export const openApiDocument = {
@@ -56,6 +57,10 @@ export const openApiDocument = {
             name: 'Activity',
             description: 'Audit trail of business events (organization, department, employee, user, and profile changes).',
         },
+        {
+            name: 'Audit',
+            description: 'Security audit logs for system events, logins, and access control changes.',
+        },
     ],
 
     components: {
@@ -70,5 +75,6 @@ export const openApiDocument = {
         ...userPaths,
         ...profilePaths,
         ...activityPaths,
+        ...auditPaths,
     },
 };
