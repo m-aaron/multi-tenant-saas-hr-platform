@@ -60,6 +60,8 @@ async function writeActivityLog(params: WriteActivityLogParams): Promise<Activit
 }
 
 
+// --- Organization ---
+
 async function logOrganizationUpdated(
     context: ActivityLogWriteContext,
     payload: { name: string },
@@ -70,6 +72,9 @@ async function logOrganizationUpdated(
         metadata: payload,
     });
 }
+
+
+// --- Department ---
 
 async function logDepartmentCreated(
     context: ActivityLogWriteContext,
@@ -103,6 +108,9 @@ async function logDepartmentArchived(
         metadata: payload,
     });
 }
+
+
+// --- Employee ---
 
 async function logEmployeeCreated(
     context: ActivityLogWriteContext,
@@ -141,6 +149,9 @@ async function logEmployeeArchived(
         metadata: payload,
     });
 }
+
+
+// --- User ---
 
 async function logUserCreated(
     context: ActivityLogWriteContext,
@@ -185,6 +196,9 @@ async function logUserReactivated(
         metadata: payload,
     });
 }
+
+
+// --- Profile ---
 
 async function logProfileUpdated(
     context: ActivityLogWriteContext,

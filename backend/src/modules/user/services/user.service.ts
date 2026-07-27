@@ -5,6 +5,7 @@ import type { CreateUserInput, InviteUserInput, UpdateUserInput } from '#modules
 import { USER_STATUS } from '#modules/user/constants/user.constant.js';
 
 import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+import { AuditLogService } from "#modules/audit/services/audit.service.js";
 
 import { 
     createUser as insertUser,
@@ -82,6 +83,11 @@ export async function createUser(
             { userId: createdUser.id, email: createdUser.email }
         );
 
+        await AuditLogService.logUserCreated(
+            { organizationId, actorId, client },
+            { userId: createdUser.id, email: createdUser.email }
+        );
+
         return createdUser;
     });
 
@@ -141,6 +147,11 @@ export async function inviteUser(
         }
 
         await ActivityLogService.logUserInvited(
+            { organizationId, actorId, client },
+            { userId: invitedUser.id, email: invitedUser.email }
+        );
+
+        await AuditLogService.logUserInvited(
             { organizationId, actorId, client },
             { userId: invitedUser.id, email: invitedUser.email }
         );
@@ -241,6 +252,11 @@ export async function updateUser(
             { userId: updatedUser.id }
         );
 
+        await AuditLogService.logUserUpdated(
+            { organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
+
         return updatedUser;
     });
 
@@ -274,6 +290,11 @@ export async function activateUser(
         }
 
         await ActivityLogService.logUserReactivated(
+            { organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
+
+        await AuditLogService.logUserReactivated(
             { organizationId, actorId, client },
             { userId: updatedUser.id }
         );

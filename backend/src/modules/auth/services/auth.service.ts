@@ -45,6 +45,8 @@ import {
     updateSessionRefreshToken
 } from '#modules/session/repositories/session.repository.js';
 
+import { AuditLogService } from '#modules/audit/services/audit.service.js';
+
 
 // This service function handles the registration of a new organization along with its owner user and employee.
 export async function registerOrganization(input: RegisterOrganizationInput): Promise<void> {
@@ -98,6 +100,31 @@ export async function registerOrganization(input: RegisterOrganizationInput): Pr
         );
 
         await createProfile(client, userId);
+
+        await AuditLogService.logOrganizationRegistered(
+            { organizationId: organization.id, actorId: null, client },
+            { organizationId: organization.id, name: input.name, slug: input.slug },
+        );
+
+        await AuditLogService.logEmployeeCreated(
+            { organizationId: organization.id, actorId: null, client },
+            { 
+                employeeId: employee.id, 
+                employeeNumber,
+                firstName: input.firstName,
+                lastName: input.lastName
+            },
+        );
+
+        await AuditLogService.logUserCreated(
+            { organizationId: organization.id, actorId: null, client },
+            { userId, email: input.ownerEmail },
+        );
+
+        await AuditLogService.logProfileCreated(
+            { organizationId: organization.id, actorId: null, client },
+            { userId },
+        );
     });
 }
 
@@ -107,6 +134,10 @@ export async function login(input: LoginInput): Promise<LoginResult> {
 
     const result = await withTransaction(async (client) => {
 
+        // Resolve the organization by slug first so we have an organizationId
+        // available for audit logging even when the user is not found.
+        const organization = await findOrganizationBySlug(client, input.organizationSlug);
+
         const user = await findUserForLogin(client, 
             { 
                 organizationSlug: input.organizationSlug, 
@@ -115,6 +146,12 @@ export async function login(input: LoginInput): Promise<LoginResult> {
         );
 
         if (!user || !user.passwordHash) {
+            if (organization) {
+                await AuditLogService.logAuthLoginFailed(
+                    { organizationId: organization.id, actorId: null },
+                    { email: input.email, reason: 'User not found.' },
+                );
+            };
             throw new UnauthorizedError('Invalid credentials.');
         }
 
@@ -129,10 +166,20 @@ export async function login(input: LoginInput): Promise<LoginResult> {
         const isPasswordValid = await verifyPassword(passwordHash, input.password);
 
         if (!isPasswordValid) {
+            await AuditLogService.logAuthLoginFailed(
+                { organizationId, actorId: userId },
+                { email, reason: 'Invalid password.' },
+            );
             throw new UnauthorizedError('Invalid credentials.');
         }
 
         if (userStatus !== 'active') {
+            if (organization) {
+                await AuditLogService.logAuthLoginFailed(
+                    { organizationId, actorId: userId },
+                    { email, reason: 'User account is not active.' },
+                );
+            };
             throw new ForbiddenError('User account is not active.');
         }
 
@@ -152,6 +199,11 @@ export async function login(input: LoginInput): Promise<LoginResult> {
             refreshTokenHash: session.refreshTokenHash,
             expiresAt: session.expiresAt
         });
+
+        await AuditLogService.logAuthLogin(
+            { organizationId, actorId: userId, client },
+            { userId, email },
+        );
 
         return {
             user: {
@@ -249,15 +301,24 @@ export async function logout(refreshToken: string): Promise<void> {
 
         await revokeSession(client, session.id);
 
+        await AuditLogService.logAuthLogout(
+            { organizationId: session.organizationId, actorId: session.userId, client },
+            { userId: session.userId },
+        );
     });
 }
 
 
 // This service function handles the logout of a user from all active sessions.
-export async function logoutAllSessions(userId: string): Promise<void> {
+export async function logoutAllSessions(organizationId: string, userId: string): Promise<void> {
     
     await withTransaction(async (client) => {
     
         await revokeAllSessions(client, userId);
+
+        await AuditLogService.logAuthLogoutAll(
+            { organizationId, actorId: userId, client },
+            { userId },
+        );
     });
 }

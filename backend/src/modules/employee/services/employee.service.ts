@@ -4,6 +4,7 @@ import type { EmployeeRow } from '#modules/employee/types/employee.type.js';
 import type { CreateEmployeeInput, UpdateEmployeeInput } from '#modules/employee/schemas/employee.schema.js';
 
 import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+import { AuditLogService } from "#modules/audit/services/audit.service.js";
 
 import { 
     createEmployee as insertEmployee,
@@ -40,6 +41,16 @@ export async function createEmployee(
         const employee = await insertEmployee(client, organizationId, employeeNumber, input);
 
         await ActivityLogService.logEmployeeCreated(
+            { organizationId, actorId, client },
+            { 
+                employeeId: employee.id,
+                employeeNumber: employee.employeeNumber,
+                firstName: employee.firstName,
+                lastName: employee.lastName
+            }
+        );
+
+        await AuditLogService.logEmployeeCreated(
             { organizationId, actorId, client },
             { 
                 employeeId: employee.id,
@@ -125,6 +136,11 @@ export async function updateEmployee(
             { employeeId: updatedEmployee.id }
         );
 
+        await AuditLogService.logEmployeeUpdated(
+            { organizationId, actorId, client },
+            { employeeId: updatedEmployee.id }
+        );
+
         return updatedEmployee;
     });
 
@@ -154,6 +170,11 @@ export async function deleteEmployee(
         }
 
         await ActivityLogService.logEmployeeArchived(
+            { organizationId, actorId, client },
+            { employeeId: employee.id }
+        );
+
+        await AuditLogService.logEmployeeArchived(
             { organizationId, actorId, client },
             { employeeId: employee.id }
         );

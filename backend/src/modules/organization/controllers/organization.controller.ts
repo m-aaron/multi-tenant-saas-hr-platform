@@ -31,10 +31,10 @@ export const getCurrentOrganization: RequestHandler = asyncHandler(async (reques
 // This controller function handles the updating organization information.
 export const updateCurrentOrganization: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { organizationId, id: actorId } = request.user!;
+    const { organizationId } = request.user!;
     const input: UpdateOrganizationInput = request.body;
 
-    const result = await updateCurrentOrganizationService(input, organizationId, actorId);
+    const result = await updateCurrentOrganizationService(input, organizationId);
 
     const responseBody: ApiSuccessResponse<typeof result> = {
         success: true,

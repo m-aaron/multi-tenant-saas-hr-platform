@@ -10,6 +10,7 @@ import { ConflictError } from "#shared/errors/conflict-error.js";
 import { NotFoundError } from "#shared/errors/not-found-error.js";
 
 import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+import { AuditLogService } from "#modules/audit/services/audit.service.js";
 
 import { 
     findDepartmentByName, 
@@ -41,6 +42,11 @@ export async function createDepartment(
         const department =  await insertDepartment(client, organizationId, input);
 
         await ActivityLogService.logDepartmentCreated(
+            { organizationId, actorId, client },
+            { departmentId: department.id, name: department.name }
+        );
+
+        await AuditLogService.logDepartmentCreated(
             { organizationId, actorId, client },
             { departmentId: department.id, name: department.name }
         );
@@ -86,6 +92,11 @@ export async function updateDepartment(
         }
 
         await ActivityLogService.logDepartmentUpdated(
+            { organizationId, actorId, client },
+            { departmentId: updatedDepartment.id, name: updatedDepartment.name }
+        );
+
+        await AuditLogService.logDepartmentUpdated(
             { organizationId, actorId, client },
             { departmentId: updatedDepartment.id, name: updatedDepartment.name }
         );
@@ -157,6 +168,11 @@ export async function deleteDepartment(
         }
 
         await ActivityLogService.logDepartmentArchived(
+            { organizationId, actorId, client },
+            { departmentId: department.id, name: department.name }
+        );
+
+        await AuditLogService.logDepartmentArchived(
             { organizationId, actorId, client },
             { departmentId: department.id, name: department.name }
         );

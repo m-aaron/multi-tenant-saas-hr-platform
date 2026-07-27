@@ -2,8 +2,6 @@ import { withTransaction } from "#databases/transaction.js";
 import { ForbiddenError } from "#shared/errors/forbidden-error.js";
 import { NotFoundError } from "#shared/errors/not-found-error.js";
 
-import { ActivityLogService } from "#modules/activity/services/activity.service.js";
-
 import {
     findOrganizationById,
     updateOrganizationById 
@@ -40,9 +38,8 @@ export async function getCurrentOrganization(
 
 // This service function handles the updating organization and returns their updated information.
 export async function updateCurrentOrganization(
-    input: UpdateOrganizationInput,
-    organizationId: string,
-    actorId: string,
+    input: UpdateOrganizationInput, 
+    organizationId: string
 ): Promise<OrganizationRow> {
 
     const result = await withTransaction(async (client) => {
@@ -56,11 +53,6 @@ export async function updateCurrentOrganization(
         if (organization.revokedAt) {
             throw new ForbiddenError('Organization is not active.')
         }
-
-        await ActivityLogService.logOrganizationUpdated(
-            { organizationId, actorId, client },
-            { name: organization.name },
-        );
 
         return organization;
     });

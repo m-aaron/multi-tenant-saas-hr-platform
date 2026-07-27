@@ -12,6 +12,7 @@ import employeeRouter from '#modules/employee/routes/employee.route.js';
 import userRouter from '#modules/user/routes/user.route.js';
 import profileRouter from '#modules/profile/routes/profile.route.js';
 import activityRouter from '#modules/activity/routes/activity.route.js';
+import auditRouter from '#modules/audit/routes/audit.route.js';
 
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import { notFoundMiddleware } from './middlewares/not-found.middleware.js';
@@ -35,6 +36,7 @@ app.use(`${API_PREFIX}/employees`, employeeRouter);
 app.use(`${API_PREFIX}/users`, userRouter);
 app.use(`${API_PREFIX}/profile`, profileRouter);
 app.use(`${API_PREFIX}/activities`, activityRouter);
+app.use(`${API_PREFIX}/audits`, auditRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

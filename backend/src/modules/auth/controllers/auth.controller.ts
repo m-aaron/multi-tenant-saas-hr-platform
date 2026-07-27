@@ -86,9 +86,9 @@ export const logout: RequestHandler = asyncHandler(async (request, response) => 
 // This controller function handles the logout of a user from all sessions.
 export const logoutAllSessions: RequestHandler = asyncHandler(async (request, response) => {
 
-    const { id } = request.user!;
+    const { id, organizationId } = request.user!;
 
-    await logoutAllSessionsService(id);
+    await logoutAllSessionsService(organizationId, id);
 
     const responseBody: ApiSuccessResponse<null> = {
         success: true,

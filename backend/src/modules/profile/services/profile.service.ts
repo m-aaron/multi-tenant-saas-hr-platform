@@ -4,6 +4,7 @@ import type { ProfileDetails, ProfileRow } from '#modules/profile/types/profile.
 import type { UpdatePasswordInput, UpdateProfileInput } from '#modules/profile/schemas/profile.schema.js';
 
 import { ActivityLogService } from "#modules/activity/services/activity.service.js";
+import { AuditLogService } from "#modules/audit/services/audit.service.js";
 
 import {
     findProfileByUserId,
@@ -62,6 +63,11 @@ export async function updateProfile(
             { userId: updatedProfile.userId }
         );
 
+        await AuditLogService.logProfileUpdated(
+            { organizationId: currentProfile.organization.organizationId, actorId, client },
+            { userId: updatedProfile.userId }
+        );
+
         return updatedProfile;
     });
 
@@ -111,6 +117,11 @@ export async function updatePassword(
         }
 
         await ActivityLogService.logProfilePasswordChanged(
+            { organizationId: profile.organization.organizationId, actorId, client },
+            { userId: updatedUser.id }
+        );
+
+        await AuditLogService.logProfilePasswordChanged(
             { organizationId: profile.organization.organizationId, actorId, client },
             { userId: updatedUser.id }
         );
