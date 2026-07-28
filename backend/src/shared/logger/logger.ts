@@ -1,16 +1,16 @@
 import pino, { type LoggerOptions } from 'pino';
 
 
-const isDevelopment = process.env['NODE_ENV'] === 'development';
+const isProduction = process.env['NODE_ENV'] === 'production';
 
 const options: LoggerOptions = {
-    level: isDevelopment ? 'debug' : 'info'
+    level: isProduction ? 'info' : 'debug',
 };
 
-if (isDevelopment) {
+if (!isProduction) {
     options.transport = {
         target: 'pino-pretty',
-        options: { colorize: true }
+        options: { colorize: true },
     };
 }
 

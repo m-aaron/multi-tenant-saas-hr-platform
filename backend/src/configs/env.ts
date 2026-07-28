@@ -1,7 +1,19 @@
 import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
 
 
-dotenv.config();
+const nodeEnv = process.env['NODE_ENV'] ?? 'development';
+
+const envFile =
+    nodeEnv === 'test'
+        ? '.env.test'
+        : '.env';
+
+dotenvExpand.expand(
+    dotenv.config({
+        path: envFile,
+    }),
+);
 
 function getEnv(key: string,): string {
     const value = process.env[key];
@@ -15,7 +27,7 @@ function getEnv(key: string,): string {
 
 export const env = {
     port: Number(process.env['PORT'] ?? 4000),
-    NODE_ENV: process.env['NODE_ENV'] ?? 'development',
+    NODE_ENV: nodeEnv,
 
     db: {
         host: getEnv('DATABASE_HOST'),

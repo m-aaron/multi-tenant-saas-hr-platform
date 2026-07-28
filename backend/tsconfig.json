@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
 
     // Environment Settings
@@ -9,7 +9,7 @@
     "moduleResolution": "nodenext",
     "target": "esnext",
     "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
 
     // Path Alias Resolution
     // Tells TypeScript to resolve the "@dev" condition in package.json "imports",
@@ -49,6 +49,6 @@
     // constructs that require code generation beyond simple type erasure.
     "erasableSyntaxOnly": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "database/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
