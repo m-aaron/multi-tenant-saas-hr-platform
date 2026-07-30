@@ -15,6 +15,11 @@ export interface AuditLogRow {
     entity: string;
 }
 
+export interface ActivityLogRow {
+    actor_id: string | null;
+    event_type: string;
+}
+
 
 export async function cleanupOrg(slug: string): Promise<void> {
     const client = await testPool.connect();
@@ -29,9 +34,11 @@ export async function cleanupOrg(slug: string): Promise<void> {
 
         const id = orgResult.rows[0]!.id;
 
+        await client.query('DELETE FROM activity_logs WHERE organization_id = $1', [id]);
         await client.query('DELETE FROM audit_logs WHERE organization_id = $1', [id]);
         await client.query('DELETE FROM users WHERE organization_id = $1', [id]); // cascades: profiles, sessions
         await client.query('DELETE FROM employees WHERE organization_id = $1', [id]);
+        await client.query('DELETE FROM departments WHERE organization_id = $1', [id]);
         await client.query('DELETE FROM roles WHERE organization_id = $1', [id]);
         await client.query('DELETE FROM organizations WHERE id = $1', [id]);
     } finally {
@@ -106,6 +113,29 @@ export async function getSession(sessionId: string): Promise<SessionRow> {
     }
     return result.rows[0]!;
 }
+
+
+export async function getLatestActivityLog(
+    orgId: string,
+    eventType: string,
+): Promise<ActivityLogRow | undefined> {
+    const result = await testPool.query<ActivityLogRow>(
+        `
+            SELECT 
+                actor_id,
+                event_type
+            FROM activity_logs
+            WHERE 
+                organization_id = $1 
+                AND event_type = $2
+            ORDER BY created_at DESC
+            LIMIT 1
+        `,
+        [orgId, eventType],
+    );
+    return result.rows[0];
+}
+
 
 
 export async function getLatestAuditLog(
