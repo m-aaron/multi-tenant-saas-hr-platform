@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { api } from '#helpers/test-request.helper.js';
 import { testPool } from '#tests/setup.js';
@@ -40,9 +40,13 @@ const VALID_PAYLOAD = {
 
 describe('POST /api/v1/auth/register', () => {
 
-    afterAll(async () => {
+    beforeEach(async () => {
         await cleanupOrg(ORG_SLUG);
-        // Also clean up the org created by the duplicate-name conflict test
+        await cleanupOrg(`${ORG_SLUG}-different-slug`);
+    });
+
+    afterEach(async () => {
+        await cleanupOrg(ORG_SLUG);
         await cleanupOrg(`${ORG_SLUG}-different-slug`);
     });
 
@@ -53,77 +57,55 @@ describe('POST /api/v1/auth/register', () => {
 
     describe('when a valid payload is submitted', () => {
 
-        // orgId is captured in the first test and shared across the group.
-        // These tests intentionally form an ordered scenario: register → verify DB state.
-        let orgId: string;
-
-        it('returns 201 with the expected response body', async () => {
+        it('registers a new organization and verifies organization, default roles, employee, user, profile, and audit log side effects', async () => {
             const response = await api
                 .post('/api/v1/auth/register')
                 .send(VALID_PAYLOAD);
 
             expectNullDataSuccessResponse(response, 201);
-        });
 
-        it('persists an organization row with the correct name and slug', async () => {
-            const result = await testPool.query<{ id: string; name: string; slug: string }>(
+            const orgResult = await testPool.query<{ id: string; name: string; slug: string }>(
                 'SELECT id, name, slug FROM organizations WHERE slug = $1',
                 [ORG_SLUG],
             );
 
-            expect(result.rows).toHaveLength(1);
-            expect(result.rows[0]!.name).toBe(ORG_NAME);
-            expect(result.rows[0]!.slug).toBe(ORG_SLUG);
+            expect(orgResult.rows).toHaveLength(1);
+            expect(orgResult.rows[0]!.name).toBe(ORG_NAME);
+            expect(orgResult.rows[0]!.slug).toBe(ORG_SLUG);
 
-            // Capture for subsequent DB checks in this describe block
-            orgId = result.rows[0]!.id;
-        });
+            const orgId = orgResult.rows[0]!.id;
 
-        it('seeds default roles for the organization', async () => {
-            const result = await testPool.query<{ count: string }>(
+            const rolesResult = await testPool.query<{ count: string }>(
                 'SELECT COUNT(*) AS count FROM roles WHERE organization_id = $1',
                 [orgId],
             );
+            expect(Number(rolesResult.rows[0]!.count)).toBeGreaterThan(0);
 
-            expect(Number(result.rows[0]!.count)).toBeGreaterThan(0);
-        });
-
-        it('creates an owner employee row', async () => {
-            const result = await testPool.query<{ first_name: string; last_name: string }>(
+            const empResult = await testPool.query<{ first_name: string; last_name: string }>(
                 'SELECT first_name, last_name FROM employees WHERE organization_id = $1',
                 [orgId],
             );
+            expect(empResult.rows).toHaveLength(1);
+            expect(empResult.rows[0]!.first_name).toBe(VALID_PAYLOAD.firstName);
+            expect(empResult.rows[0]!.last_name).toBe(VALID_PAYLOAD.lastName);
 
-            expect(result.rows).toHaveLength(1);
-            expect(result.rows[0]!.first_name).toBe(VALID_PAYLOAD.firstName);
-            expect(result.rows[0]!.last_name).toBe(VALID_PAYLOAD.lastName);
-        });
-
-        it('creates an owner user row with status active', async () => {
-            const result = await testPool.query<{ email: string; status: string }>(
+            const userResult = await testPool.query<{ email: string; status: string }>(
                 'SELECT email, status FROM users WHERE organization_id = $1',
                 [orgId],
             );
+            expect(userResult.rows).toHaveLength(1);
+            expect(userResult.rows[0]!.email).toBe(OWNER_EMAIL.toLowerCase());
+            expect(userResult.rows[0]!.status).toBe('active');
 
-            expect(result.rows).toHaveLength(1);
-            expect(result.rows[0]!.email).toBe(OWNER_EMAIL.toLowerCase());
-            expect(result.rows[0]!.status).toBe('active');
-        });
-
-        it('creates a profile row for the owner user', async () => {
             const userId = await getUserId(orgId);
-
             const profileResult = await testPool.query<{ user_id: string }>(
                 'SELECT user_id FROM profiles WHERE user_id = $1',
                 [userId],
             );
-
             expect(profileResult.rows).toHaveLength(1);
             expect(profileResult.rows[0]!.user_id).toBe(userId);
-        });
 
-        it('writes audit log entries for the registration', async () => {
-            const result = await testPool.query<{ action: string; entity: string }>(
+            const auditLogsResult = await testPool.query<{ action: string; entity: string }>(
                 `
                 SELECT 
                     action,
@@ -135,9 +117,7 @@ describe('POST /api/v1/auth/register', () => {
                 [orgId],
             );
 
-            const entries = result.rows;
-
-            // Expect entries for: org registered, employee created, user created, profile created
+            const entries = auditLogsResult.rows;
             expect(entries.length).toBeGreaterThanOrEqual(4);
 
             const actions = entries.map((r) => `${r.action}:${r.entity}`);
@@ -145,13 +125,10 @@ describe('POST /api/v1/auth/register', () => {
             expect(actions).toContain('created:employee');
             expect(actions).toContain('created:user');
             expect(actions).toContain('created:profile');
-        });
 
-        it('writes a registered:organization audit log entry', async () => {
-            const log = await getLatestAuditLog(orgId, 'registered');
-            expect(log).toBeDefined();
-            expect(log!.entity).toBe('organization');
-            // actor_id is null at registration time — no user exists yet
+            const regAuditLog = await getLatestAuditLog(orgId, 'registered');
+            expect(regAuditLog).toBeDefined();
+            expect(regAuditLog!.entity).toBe('organization');
         });
     });
 
@@ -257,6 +234,8 @@ describe('POST /api/v1/auth/register', () => {
     describe('when the organization already exists', () => {
 
         it('returns 409 when the organization name is already taken', async () => {
+            await api.post('/api/v1/auth/register').send(VALID_PAYLOAD);
+
             // Register with the same name but a different slug
             const response = await api
                 .post('/api/v1/auth/register')
@@ -270,6 +249,8 @@ describe('POST /api/v1/auth/register', () => {
         });
 
         it('returns 409 when the organization slug is already taken', async () => {
+            await api.post('/api/v1/auth/register').send(VALID_PAYLOAD);
+
             // Register with the same slug but a different name
             const response = await api
                 .post('/api/v1/auth/register')

@@ -102,7 +102,7 @@ describe('POST /api/v1/auth/logout', () => {
 
     describe('when a valid refresh token is supplied', () => {
 
-        it('returns 200 with the expected response body', async () => {
+        it('logs out current session and verifies null data response, session revocation in database, and audit log side effects', async () => {
             const { refreshToken, sessionId } = await loginAndGetTokens();
 
             const response = await api
@@ -114,14 +114,8 @@ describe('POST /api/v1/auth/logout', () => {
             // DB: session must now be revoked
             const session = await getSession(sessionId);
             expect(session.revoked_at).not.toBeNull();
-        });
 
-        it('writes a logout audit log entry', async () => {
-            const { refreshToken } = await loginAndGetTokens();
-
-            await api.post('/api/v1/auth/logout').send({ refreshToken });
-
-            // Fresh org — no prior logout entries; assert the one we just created
+            // Audit log: logout entry created
             const log = await getLatestAuditLog(orgId, 'logout');
             expect(log).toBeDefined();
             expect(log!.actor_id).toBe(userId);
@@ -196,7 +190,7 @@ describe('POST /api/v1/auth/logout-all', () => {
 
     describe('when a valid access token is supplied', () => {
 
-        it('returns 200 and revokes all active sessions', async () => {
+        it('logs out all sessions for the user and verifies null data response, all sessions revoked in database, and logout_all audit log side effects', async () => {
             const session1 = await loginAndGetTokens();
             const session2 = await loginAndGetTokens();
 
@@ -213,16 +207,8 @@ describe('POST /api/v1/auth/logout-all', () => {
             ]);
             expect(s1.revoked_at).not.toBeNull();
             expect(s2.revoked_at).not.toBeNull();
-        });
 
-        it('writes a logout_all audit log entry', async () => {
-            const { accessToken } = await loginAndGetTokens();
-
-            await api
-                .post('/api/v1/auth/logout-all')
-                .set('Authorization', `Bearer ${accessToken}`);
-
-            // Fresh org — no prior logout_all entries; assert the one we just created
+            // Audit log: logout_all entry created
             const log = await getLatestAuditLog(orgId, 'logout_all');
             expect(log).toBeDefined();
             expect(log!.actor_id).toBe(userId);

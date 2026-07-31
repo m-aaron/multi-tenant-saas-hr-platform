@@ -46,7 +46,7 @@ let accessToken: string;
 // ---------------------------------------------------------------------------
 
 beforeEach(async () => {
-    await cleanupOrg(ORG_SLUG); // safe no-op on first run
+    await cleanupOrg(ORG_SLUG);
 
     await api.post('/api/v1/auth/register').send(REGISTER_PAYLOAD);
 
@@ -70,7 +70,7 @@ afterEach(async () => {
 
 
 // ---------------------------------------------------------------------------
-// Helper to update user role for testing permission checks
+// Helpers
 // ---------------------------------------------------------------------------
 
 async function setUserRole(roleName: 'employee' | 'administrator' | 'owner'): Promise<void> {
@@ -92,7 +92,11 @@ async function setUserRole(roleName: 'employee' | 'administrator' | 'owner'): Pr
 
 describe('GET /api/v1/organizations/me', () => {
 
-    describe('when authenticated as owner or administrator', () => {
+    // -------------------------------------------------------------------------
+    // Happy path
+    // -------------------------------------------------------------------------
+
+    describe('when authenticated with allowed roles', () => {
 
         it('returns 200 with the organization details for owner', async () => {
             const response = await api
@@ -121,11 +125,15 @@ describe('GET /api/v1/organizations/me', () => {
         });
     });
 
-    describe('when authentication fails', () => {
+
+    // -------------------------------------------------------------------------
+    // Authentication or authorization fails (401, 403)
+    // -------------------------------------------------------------------------
+
+    describe('when authentication or authorization fails', () => {
 
         it('returns 401 when Authorization header is missing', async () => {
-            const response = await api
-                .get('/api/v1/organizations/me');
+            const response = await api.get('/api/v1/organizations/me');
 
             expectUnauthorizedResponse(response, /authorization header is missing/i);
         });
@@ -137,11 +145,8 @@ describe('GET /api/v1/organizations/me', () => {
 
             expectUnauthorizedResponse(response, /invalid or expired access token/i);
         });
-    });
 
-    describe('when authorization fails', () => {
-
-        it('returns 403 when user has forbidden role', async () => {
+        it('returns 403 when user has forbidden role (employee)', async () => {
             await setUserRole('employee');
 
             const response = await api
@@ -151,6 +156,11 @@ describe('GET /api/v1/organizations/me', () => {
             expectForbiddenResponse(response, /you do not have permission to perform this action/i);
         });
     });
+
+
+    // -------------------------------------------------------------------------
+    // Organization status invalid
+    // -------------------------------------------------------------------------
 
     describe('when organization status is invalid', () => {
 
@@ -176,9 +186,13 @@ describe('GET /api/v1/organizations/me', () => {
 
 describe('PATCH /api/v1/organizations/me', () => {
 
+    // -------------------------------------------------------------------------
+    // Happy path
+    // -------------------------------------------------------------------------
+
     describe('when a valid payload is supplied', () => {
 
-        it('returns 200 and updates organization name in DB', async () => {
+        it('updates an organization and records persistence, activity, and audit side effects', async () => {
             const newName = `Updated Org Name ${crypto.randomUUID()}`;
 
             const response = await api
@@ -189,46 +203,27 @@ describe('PATCH /api/v1/organizations/me', () => {
             expectSuccessResponse(response, 200);
             expect(response.body.data.name).toBe(newName);
 
-            // DB verification: query organization name directly
             const dbResult = await testPool.query<{ name: string }>(
                 'SELECT name FROM organizations WHERE id = $1',
                 [orgId],
             );
             expect(dbResult.rows[0]!.name).toBe(newName);
-        });
 
-        it('writes an activity log entry when organization is updated', async () => {
-            const newName = `Updated Org Name ${crypto.randomUUID()}`;
+            const activityLog = await getLatestActivityLog(orgId, 'organization.updated');
+            expect(activityLog).toBeDefined();
+            expect(activityLog!.actor_id).toBe(userId);
 
-            const response = await api
-                .patch('/api/v1/organizations/me')
-                .set('Authorization', `Bearer ${accessToken}`)
-                .send({ name: newName });
-
-            expectSuccessResponse(response, 200);
-
-            const log = await getLatestActivityLog(orgId, 'organization.updated');
-
-            expect(log).toBeDefined();
-            expect(log!.actor_id).toBe(userId);
-            expect(log!.event_type).toBe('organization.updated');
-        });
-
-        it('writes an audit log entry when organization is updated', async () => {
-            const newName = `Updated Org Name ${crypto.randomUUID()}`;
-
-            await api
-                .patch('/api/v1/organizations/me')
-                .set('Authorization', `Bearer ${accessToken}`)
-                .send({ name: newName });
-
-            const log = await getLatestAuditLog(orgId, 'updated');
-
-            expect(log).toBeDefined();
-            expect(log!.actor_id).toBe(userId);
-            expect(log!.entity).toBe('organization');
+            const auditLog = await getLatestAuditLog(orgId, 'updated');
+            expect(auditLog).toBeDefined();
+            expect(auditLog!.actor_id).toBe(userId);
+            expect(auditLog!.entity).toBe('organization');
         });
     });
+
+
+    // -------------------------------------------------------------------------
+    // Validation fails (400)
+    // -------------------------------------------------------------------------
 
     describe('when validation fails (400)', () => {
 
@@ -251,6 +246,11 @@ describe('PATCH /api/v1/organizations/me', () => {
         });
     });
 
+
+    // -------------------------------------------------------------------------
+    // Authentication or authorization fails (401, 403)
+    // -------------------------------------------------------------------------
+
     describe('when authentication or authorization fails', () => {
 
         it('returns 401 when Authorization header is missing', async () => {
@@ -261,7 +261,7 @@ describe('PATCH /api/v1/organizations/me', () => {
             expectUnauthorizedResponse(response, /authorization header is missing/i);
         });
 
-        it('returns 403 when user has forbidden role', async () => {
+        it('returns 403 when user has forbidden role (employee)', async () => {
             await setUserRole('employee');
 
             const response = await api

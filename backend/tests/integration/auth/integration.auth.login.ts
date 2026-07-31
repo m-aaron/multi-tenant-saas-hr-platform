@@ -76,7 +76,7 @@ describe('POST /api/v1/auth/login', () => {
 
     describe('when valid credentials are supplied', () => {
 
-        it('returns 200 with the correct response shape', async () => {
+        it('logs in successfully and verifies token response shape, active session database persistence, and audit log side effects', async () => {
             const response = await api
                 .post('/api/v1/auth/login')
                 .send(LOGIN_PAYLOAD);
@@ -97,24 +97,14 @@ describe('POST /api/v1/auth/login', () => {
             expect(tokens.accessToken.length).toBeGreaterThan(0);
             expect(typeof tokens.refreshToken).toBe('string');
             expect(tokens.refreshToken.length).toBeGreaterThan(0);
-        });
 
-        it('creates an active session row in the database', async () => {
-            const loginResponse = await api
-                .post('/api/v1/auth/login')
-                .send(LOGIN_PAYLOAD);
-
-            expect(loginResponse.status).toBe(200);
-
+            // Active session DB persistence
             const session = await getLatestSession(userId);
             expect(session.refresh_token_hash).toBeTruthy();
             expect(session.revoked_at).toBeNull();
             expect(new Date(session.expires_at).getTime()).toBeGreaterThan(Date.now());
-        });
 
-        it('writes a login audit log entry', async () => {
-            await api.post('/api/v1/auth/login').send(LOGIN_PAYLOAD);
-
+            // Audit log side effect
             const log = await getLatestAuditLog(orgId, 'login');
             expect(log).toBeDefined();
             expect(log!.actor_id).toBe(userId);

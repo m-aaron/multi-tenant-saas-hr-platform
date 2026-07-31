@@ -84,7 +84,7 @@ describe('POST /api/v1/auth/refresh', () => {
 
     describe('when a valid refresh token is supplied', () => {
 
-        it('returns 200 with a new access token and refresh token', async () => {
+        it('refreshes tokens and verifies new token response, rotated refresh_token_hash, and updated last_used_at timestamp in database', async () => {
             const response = await api
                 .post('/api/v1/auth/refresh')
                 .send({ refreshToken });
@@ -98,20 +98,11 @@ describe('POST /api/v1/auth/refresh', () => {
             expect(typeof newRefreshToken).toBe('string');
             expect(newRefreshToken.length).toBeGreaterThan(0);
             expect(newRefreshToken).not.toBe(refreshToken);
-        });
 
-        it('rotates the session refresh_token_hash in the database', async () => {
-            await api.post('/api/v1/auth/refresh').send({ refreshToken });
-
+            // DB session persistence & rotation checks
             const session = await getSession(sessionId);
             expect(session.refresh_token_hash).toBeTruthy();
             expect(session.refresh_token_hash).not.toBe(originalHash);
-        });
-
-        it('sets last_used_at on the session row', async () => {
-            await api.post('/api/v1/auth/refresh').send({ refreshToken });
-
-            const session = await getSession(sessionId);
             expect(session.last_used_at).not.toBeNull();
         });
     });
