@@ -16,6 +16,7 @@ export interface AuditLogRow {
 }
 
 export interface ActivityLogRow {
+    id: string;
     actor_id: string | null;
     event_type: string;
 }
@@ -122,6 +123,7 @@ export async function getLatestActivityLog(
     const result = await testPool.query<ActivityLogRow>(
         `
             SELECT 
+                id,
                 actor_id,
                 event_type
             FROM activity_logs

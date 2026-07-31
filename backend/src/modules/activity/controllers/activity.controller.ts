@@ -4,7 +4,7 @@ import { asyncHandler } from '#shared/utils/async-handler.util.js';
 
 import type { ApiSuccessResponse } from '#shared/types/api-response.type.js';
 
-import type { ListActivityLogsQuery } from '../schemas/activity.schema.js';
+import { listActivityLogsQuerySchema } from '../schemas/activity.schema.js';
 
 import { 
     getActivityLogs as getActivityLogsService, 
@@ -16,7 +16,7 @@ import {
 export const getActivityLogs: RequestHandler = asyncHandler(async (request, response) => {
     
     const { organizationId } = request.user!;
-    const query = request.query as unknown as ListActivityLogsQuery;
+    const query = listActivityLogsQuerySchema.parse(request.query);
 
     const result = await getActivityLogsService(organizationId, query);
 
