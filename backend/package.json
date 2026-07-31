@@ -69,6 +69,10 @@
     "#tests/*.js": {
       "@dev": "./tests/*.ts",
       "default": "./tests/*.ts"
+    },
+    "#mocks/*.js": {
+      "@dev": "./tests/mocks/*.ts",
+      "default": "./tests/mocks/*.ts"
     }
   },
   "dependencies": {
