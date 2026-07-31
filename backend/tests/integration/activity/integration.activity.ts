@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { api } from '#helpers/test-request.helper.js';
-import { testPool } from '#tests/setup.js';
 import {
     cleanupOrg,
     getLatestActivityLog,
     getOrgId,
     getUserId,
+    setUserRole
 } from '#helpers/test-database.helper.js';
 import {
     expectErrorResponse,
@@ -69,24 +69,6 @@ afterEach(async () => {
 });
 
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function setUserRole(
-    roleName: 'owner' | 'administrator' | 'hr_manager' | 'employee',
-): Promise<void> {
-    const roleResult = await testPool.query<{ id: string }>(
-        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
-        [orgId, roleName],
-    );
-    const roleId = roleResult.rows[0]!.id;
-    await testPool.query(
-        'UPDATE users SET role_id = $1 WHERE id = $2',
-        [roleId, userId],
-    );
-}
-
 async function triggerDepartmentActivity(name = `Dept ${crypto.randomUUID()}`): Promise<void> {
     const response = await api
         .post('/api/v1/departments')
@@ -144,7 +126,7 @@ describe('GET /api/v1/activities', () => {
         });
 
         it('returns 200 for hr_manager role', async () => {
-            await setUserRole('hr_manager');
+            await setUserRole(orgId, userId, 'hr_manager');
 
             const response = await api
                 .get('/api/v1/activities')
@@ -192,7 +174,7 @@ describe('GET /api/v1/activities', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get('/api/v1/activities')
@@ -268,7 +250,7 @@ describe('GET /api/v1/activities/:activityId', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get(`/api/v1/activities/${crypto.randomUUID()}`)

@@ -8,6 +8,7 @@ import {
     getLatestAuditLog,
     getOrgId,
     getUserId,
+    setUserRole
 } from '#helpers/test-database.helper.js';
 import {
     expectErrorResponse,
@@ -78,24 +79,6 @@ afterEach(async () => {
     await cleanupOrg(ORG_SLUG);
 });
 
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function setUserRole(
-    roleName: 'owner' | 'administrator' | 'hr_manager' | 'employee',
-): Promise<void> {
-    const roleResult = await testPool.query<{ id: string }>(
-        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
-        [orgId, roleName],
-    );
-    const roleId = roleResult.rows[0]!.id;
-    await testPool.query(
-        'UPDATE users SET role_id = $1 WHERE id = $2',
-        [roleId, userId],
-    );
-}
 
 async function createEmployee(override?: Record<string, unknown>): Promise<string> {
     const response = await api
@@ -264,7 +247,7 @@ describe('POST /api/v1/employees', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .post('/api/v1/employees')
@@ -305,7 +288,7 @@ describe('GET /api/v1/employees', () => {
         });
 
         it('returns 200 for hr_manager role', async () => {
-            await setUserRole('hr_manager');
+            await setUserRole(orgId, userId, 'hr_manager');
 
             const response = await api
                 .get('/api/v1/employees')
@@ -329,7 +312,7 @@ describe('GET /api/v1/employees', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get('/api/v1/employees')
@@ -400,7 +383,7 @@ describe('GET /api/v1/employees/:employeeId', () => {
 
         it('returns 403 when user has forbidden role (employee)', async () => {
             const employeeId = await createEmployee();
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get(`/api/v1/employees/${employeeId}`)
@@ -519,7 +502,7 @@ describe('PATCH /api/v1/employees/:employeeId', () => {
 
         it('returns 403 when user has forbidden role (employee)', async () => {
             const employeeId = await createEmployee();
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .patch(`/api/v1/employees/${employeeId}`)
@@ -615,7 +598,7 @@ describe('DELETE /api/v1/employees/:employeeId', () => {
 
         it('returns 403 when user has forbidden role (employee)', async () => {
             const employeeId = await createEmployee();
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .delete(`/api/v1/employees/${employeeId}`)

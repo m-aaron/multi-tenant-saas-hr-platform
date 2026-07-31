@@ -8,6 +8,7 @@ import {
     getLatestAuditLog,
     getOrgId,
     getUserId,
+    setUserRole
 } from '#helpers/test-database.helper.js';
 import {
     expectNullDataSuccessResponse,
@@ -70,25 +71,6 @@ afterEach(async () => {
 
 
 // ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function setUserRole(
-    roleName: 'owner' | 'administrator' | 'hr_manager' | 'employee',
-): Promise<void> {
-    const roleResult = await testPool.query<{ id: string }>(
-        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
-        [orgId, roleName],
-    );
-    const roleId = roleResult.rows[0]!.id;
-    await testPool.query(
-        'UPDATE users SET role_id = $1 WHERE id = $2',
-        [roleId, userId],
-    );
-}
-
-
-// ---------------------------------------------------------------------------
 // Tests: GET /api/v1/profile
 // ---------------------------------------------------------------------------
 
@@ -118,7 +100,7 @@ describe('GET /api/v1/profile', () => {
         });
 
         it('returns 200 for employee role', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get('/api/v1/profile')

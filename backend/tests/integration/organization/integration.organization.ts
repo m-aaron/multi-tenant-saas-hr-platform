@@ -8,6 +8,7 @@ import {
     getLatestAuditLog,
     getOrgId,
     getUserId,
+    setUserRole
 } from '#helpers/test-database.helper.js';
 import {
     expectForbiddenResponse,
@@ -70,23 +71,6 @@ afterEach(async () => {
 
 
 // ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function setUserRole(roleName: 'employee' | 'administrator' | 'owner'): Promise<void> {
-    const roleResult = await testPool.query<{ id: string }>(
-        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
-        [orgId, roleName],
-    );
-    const roleId = roleResult.rows[0]!.id;
-    await testPool.query(
-        'UPDATE users SET role_id = $1 WHERE id = $2',
-        [roleId, userId],
-    );
-}
-
-
-// ---------------------------------------------------------------------------
 // Tests: GET /api/v1/organizations/me
 // ---------------------------------------------------------------------------
 
@@ -114,7 +98,7 @@ describe('GET /api/v1/organizations/me', () => {
         });
 
         it('returns 200 with the organization details for administrator', async () => {
-            await setUserRole('administrator');
+            await setUserRole(orgId, userId, 'administrator');
 
             const response = await api
                 .get('/api/v1/organizations/me')
@@ -147,7 +131,7 @@ describe('GET /api/v1/organizations/me', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get('/api/v1/organizations/me')
@@ -262,7 +246,7 @@ describe('PATCH /api/v1/organizations/me', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .patch('/api/v1/organizations/me')

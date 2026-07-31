@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { api } from '#helpers/test-request.helper.js';
-import { testPool } from '#tests/setup.js';
 import {
     cleanupOrg,
     getLatestAuditLog,
     getOrgId,
     getUserId,
+    setUserRole
 } from '#helpers/test-database.helper.js';
 import {
     expectErrorResponse,
@@ -69,24 +69,6 @@ afterEach(async () => {
 });
 
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function setUserRole(
-    roleName: 'owner' | 'administrator' | 'hr_manager' | 'employee',
-): Promise<void> {
-    const roleResult = await testPool.query<{ id: string }>(
-        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
-        [orgId, roleName],
-    );
-    const roleId = roleResult.rows[0]!.id;
-    await testPool.query(
-        'UPDATE users SET role_id = $1 WHERE id = $2',
-        [roleId, userId],
-    );
-}
-
 async function triggerDepartmentAudit(name = `Dept ${crypto.randomUUID()}`): Promise<void> {
     const response = await api
         .post('/api/v1/departments')
@@ -145,7 +127,7 @@ describe('GET /api/v1/audits', () => {
         });
 
         it('returns 200 for administrator role', async () => {
-            await setUserRole('administrator');
+            await setUserRole(orgId, userId, 'administrator');
 
             const response = await api
                 .get('/api/v1/audits')
@@ -193,7 +175,7 @@ describe('GET /api/v1/audits', () => {
         });
 
         it('returns 403 when user has forbidden role (hr_manager)', async () => {
-            await setUserRole('hr_manager');
+            await setUserRole(orgId, userId, 'hr_manager');
 
             const response = await api
                 .get('/api/v1/audits')
@@ -203,7 +185,7 @@ describe('GET /api/v1/audits', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get('/api/v1/audits')
@@ -279,7 +261,7 @@ describe('GET /api/v1/audits/:auditId', () => {
         });
 
         it('returns 403 when user has forbidden role (hr_manager)', async () => {
-            await setUserRole('hr_manager');
+            await setUserRole(orgId, userId, 'hr_manager');
 
             const response = await api
                 .get(`/api/v1/audits/${crypto.randomUUID()}`)
@@ -289,7 +271,7 @@ describe('GET /api/v1/audits/:auditId', () => {
         });
 
         it('returns 403 when user has forbidden role (employee)', async () => {
-            await setUserRole('employee');
+            await setUserRole(orgId, userId, 'employee');
 
             const response = await api
                 .get(`/api/v1/audits/${crypto.randomUUID()}`)

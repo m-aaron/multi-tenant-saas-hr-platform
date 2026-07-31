@@ -86,6 +86,9 @@ describe('POST /api/v1/auth/refresh', () => {
 
         it('refreshes tokens and verifies new token response, rotated refresh_token_hash, and updated last_used_at timestamp in database', async () => {
             const currentRefreshToken = refreshToken;
+            // Wait 1 second so JWT issued-at timestamp (iat) advances
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
             const response = await api
                 .post('/api/v1/auth/refresh')
                 .send({ refreshToken });

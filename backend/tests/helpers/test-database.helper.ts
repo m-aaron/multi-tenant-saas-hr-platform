@@ -179,3 +179,20 @@ export async function countAuditLogs(orgId: string, action: string): Promise<num
     );
     return Number(result.rows[0]!.count);
 }
+
+
+export async function setUserRole(
+    orgId: string,
+    userId: string,
+    roleName: 'owner' | 'administrator' | 'hr_manager' | 'employee',
+): Promise<void> {
+    const roleResult = await testPool.query<{ id: string }>(
+        'SELECT id FROM roles WHERE organization_id = $1 AND name = $2',
+        [orgId, roleName],
+    );
+    const roleId = roleResult.rows[0]!.id;
+    await testPool.query(
+        'UPDATE users SET role_id = $1 WHERE id = $2',
+        [roleId, userId],
+    );
+}
