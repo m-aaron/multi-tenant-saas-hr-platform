@@ -54,25 +54,9 @@
       "@dev": "./src/middlewares/*.ts",
       "default": "./dist/middlewares/*.js"
     },
-    "#helpers/*.js": {
-      "@dev": "./tests/helpers/*.ts",
-      "default": "./tests/helpers/*.ts"
-    },
-    "#integration/*.js": {
-      "@dev": "./tests/integration/*.ts",
-      "default": "./tests/integration/*.ts"
-    },
-    "#unit/*.js": {
-      "@dev": "./tests/unit/*.ts",
-      "default": "./tests/unit/*.ts"
-    },
     "#tests/*.js": {
       "@dev": "./tests/*.ts",
       "default": "./tests/*.ts"
-    },
-    "#mocks/*.js": {
-      "@dev": "./tests/mocks/*.ts",
-      "default": "./tests/mocks/*.ts"
     }
   },
   "dependencies": {

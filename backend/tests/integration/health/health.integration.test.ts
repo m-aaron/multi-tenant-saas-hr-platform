@@ -1,4 +1,4 @@
-import { api } from '#helpers/test-request.helper.js';
+import { api } from '#tests/helpers/test-request.helper.js';
 
 describe('Health Module', () => {
     describe('GET /api/v1/health', () => {

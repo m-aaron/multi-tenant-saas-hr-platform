@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { api } from '#helpers/test-request.helper.js';
+import { api } from '#tests/helpers/test-request.helper.js';
 import { testPool } from '#tests/setup.js';
 import {
     cleanupOrg,
@@ -9,7 +9,7 @@ import {
     getOrgId,
     getUserId,
     setUserRole
-} from '#helpers/test-database.helper.js';
+} from '#tests/helpers/test-database.helper.js';
 import {
     expectConflictResponse,
     expectErrorResponse,
@@ -17,7 +17,7 @@ import {
     expectSuccessResponse,
     expectUnauthorizedResponse,
     expectValidationErrorResponse,
-} from '#helpers/test-response.helper.js';
+} from '#tests/helpers/test-response.helper.js';
 
 
 // ---------------------------------------------------------------------------

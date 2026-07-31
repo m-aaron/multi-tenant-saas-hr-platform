@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { api } from '#helpers/test-request.helper.js';
+import { api } from '#tests/helpers/test-request.helper.js';
 import {
     cleanupOrg,
     getLatestActivityLog,
     getOrgId,
     getUserId,
     setUserRole
-} from '#helpers/test-database.helper.js';
+} from '#tests/helpers/test-database.helper.js';
 import {
     expectErrorResponse,
     expectForbiddenResponse,
     expectSuccessResponse,
     expectUnauthorizedResponse,
     expectValidationErrorResponse,
-} from '#helpers/test-response.helper.js';
+} from '#tests/helpers/test-response.helper.js';
 
 
 // ---------------------------------------------------------------------------
