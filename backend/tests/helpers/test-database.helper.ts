@@ -10,6 +10,7 @@ export interface SessionRow {
 }
 
 export interface AuditLogRow {
+    id: string;
     action: string;
     actor_id: string;
     entity: string;
@@ -147,6 +148,7 @@ export async function getLatestAuditLog(
     const result = await testPool.query<AuditLogRow>(
         `
             SELECT 
+                id,
                 actor_id,
                 action,
                 entity
