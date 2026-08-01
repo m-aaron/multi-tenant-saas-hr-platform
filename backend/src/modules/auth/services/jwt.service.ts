@@ -47,7 +47,7 @@ export function verifyAccessToken(token: string): JwtPayload {
             token,
             env.jwt.accessTokenSecret,
         ) as JwtPayload;
-    } catch (error) {
+    } catch {
         throw new UnauthorizedError('Invalid or expired access token.');
     }
 }
@@ -58,7 +58,7 @@ export function verifyRefreshToken(token: string): JwtPayload {
             token,
             env.jwt.refreshTokenSecret,
         ) as JwtPayload;
-    } catch (error) {
+    } catch {
         throw new UnauthorizedError('Invalid or expired refresh token.');
     }
 }

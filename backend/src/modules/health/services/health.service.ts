@@ -17,7 +17,11 @@ async function checkDatabaseConnection(): Promise<boolean> {
         const result = await db.query('SELECT 1');
         return result.rows.length > 0;
     } catch (error) {
-        console.error('[HealthCheck] Database connection failed:', error instanceof Error ? error.message : error);
+        if (env.NODE_ENV !== 'test') {
+            // Logging is intentionally kept for operational visibility in non-test environments.
+            // eslint-disable-next-line no-console
+            console.error('[HealthCheck] Database connection failed:', error instanceof Error ? error.message : error);
+        }
         return false;
     }
 }
