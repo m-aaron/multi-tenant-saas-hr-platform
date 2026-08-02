@@ -1,0 +1,40 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+coverage
+
+# Tests
+tests
+
+# Documentation
+docs
+diagrams
+
+# Git
+.git
+.github
+
+# Editors
+.vscode
+.idea
+
+# Logs
+*.log
+logs
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.test.example
+!.env.docker.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+pnpm-debug.log
+npm-debug.log
