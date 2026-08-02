@@ -66,3 +66,9 @@ jobs:
           path: backend/coverage
           if-no-files-found: error
           retention-days: 14
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --tag hr-platform-backend:${{ github.sha }} \
+            .
