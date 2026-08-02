@@ -22,6 +22,7 @@ jobs:
   backend:
     name: Build, Lint, Test & Coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     services:
       postgres:
@@ -33,7 +34,7 @@ jobs:
         ports:
           - 5434:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -41,6 +42,19 @@ jobs:
     defaults:
       run:
         working-directory: backend
+
+    env:
+      NODE_ENV: test
+      PORT: 4001
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5434
+      DATABASE_NAME: hr_platform_test
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      ACCESS_TOKEN_SECRET: test_access_secret
+      ACCESS_TOKEN_EXPIRES: 15m
+      REFRESH_TOKEN_SECRET: test_refresh_secret
+      REFRESH_TOKEN_EXPIRES: 7d
 
     steps:
       - name: Checkout repository
@@ -70,10 +84,7 @@ jobs:
       - name: Run ESLint
         run: pnpm lint
 
-      - name: Run Tests
-        run: pnpm test
-
-      - name: Generate Coverage Report
+      - name: Run Tests with Coverage
         run: pnpm test:coverage
 
       - name: Upload Coverage Report
