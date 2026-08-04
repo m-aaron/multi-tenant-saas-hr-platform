@@ -153,7 +153,7 @@ For a detailed explanation of the application architecture, module boundaries, r
 | **Testing**          | Vitest                 |
 | **Package Manager**  | pnpm                   |
 | **Containerization** | Docker, Docker Compose |
-| **CI/CD**            | GitHub Actions (Continuous Integration)        |
+| **CI/CD**            | GitHub Actions         |
 
 The project follows modern backend engineering practices, including strict TypeScript configuration, modular architecture, automated testing, containerized development, and continuous integration to support maintainable and production-ready software development.
 
@@ -224,7 +224,7 @@ The repository is organized to separate application code, technical documentatio
 Before running the project, ensure the following tools are installed:
 
 - Node.js 24+
-- pnpm 11+
+- pnpm 11.9.0
 - Docker
 - Docker Compose
 - Git
@@ -250,6 +250,8 @@ pnpm install
 Create a local environment file from the provided example.
 
 ```bash
+cd backend
+
 cp .env.example .env
 ```
 
@@ -262,6 +264,8 @@ docker compose up --build
 ```
 
 ### Run Database Migrations
+
+Migrations are run from the host machine against the Dockerized PostgreSQL instance. Ensure `backend/.env` contains `DATABASE_HOST=localhost` and `DATABASE_PORT=5434` before running:
 
 ```bash
 cd backend
@@ -288,7 +292,7 @@ A successful response should return:
 }
 ```
 
-> `uptime` is reported in seconds.
+> `uptime` is reported in seconds and reflects the server's current process uptime. Your value will differ.
 
 For detailed setup instructions, Docker workflow, and troubleshooting, see the [Docker Guide](docs/06-docker-guide.md).
 
@@ -334,7 +338,7 @@ Coverage reports are generated in the `backend/coverage/` directory.
 
 ### Continuous Integration
 
-Every pull request and push to the repository is automatically validated through GitHub Actions, including:
+Every pull request and push to the `main` or `develop` branch is automatically validated through GitHub Actions, including:
 
 - TypeScript type checking
 - ESLint code quality validation
@@ -387,7 +391,7 @@ The project uses **GitHub Actions** to automatically validate every code change,
 
 ### Continuous Integration Pipeline
 
-Every push and pull request automatically performs the following validation steps:
+Every push and pull request to the `main` or `develop` branch automatically performs the following validation steps:
 
 - TypeScript type checking
 - ESLint code quality validation
@@ -444,9 +448,7 @@ See the complete development history and future milestones in the [Development R
 
 ## Closing Statement
 
-The **Multi-Tenant SaaS HR Platform** is under active development. Upcoming milestones include production deployment to a cloud environment, additional HR modules, and continued infrastructure improvements.
-
-This project will continue evolving as additional backend capabilities, infrastructure improvements, and production deployment are completed.
+The **Multi-Tenant SaaS HR Platform** is under active development. See the [Development Roadmap](docs/09-development-roadmap.md) for upcoming milestones.
 
 ---
 
