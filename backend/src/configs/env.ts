@@ -25,11 +25,16 @@ function getEnv(key: string,): string {
     return value;
 }
 
+function getOptionalEnv(key: string): string | undefined { return process.env[key]; }
+const databaseUrl = getOptionalEnv('DATABASE_URL');
+
 export const env = {
     port: Number(process.env['PORT'] ?? 4000),
     NODE_ENV: nodeEnv,
 
-    db: {
+    db: databaseUrl ? {
+        url: databaseUrl
+    } : {
         host: getEnv('DATABASE_HOST'),
         port: Number(getEnv('DATABASE_PORT')),
         name: getEnv('DATABASE_NAME'),
