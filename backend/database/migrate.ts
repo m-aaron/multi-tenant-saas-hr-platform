@@ -63,13 +63,14 @@ export async function runMigrations(): Promise<void> {
     const orderedFiles = await parseMigrationOrder();
 
     const pool = 'url' in env.db
-        ? new Pool({ connectionString: env.db.url })
+        ? new Pool({ connectionString: env.db.url, connectionTimeoutMillis: 10000 })
         : new Pool({
             host: env.db.host,
             port: env.db.port,
             database: env.db.name,
             user: env.db.user,
             password: env.db.password,
+            connectionTimeoutMillis: 10000,
         });
 
     const client = await pool.connect();
