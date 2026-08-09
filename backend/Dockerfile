@@ -68,5 +68,5 @@ STOPSIGNAL SIGTERM
 # Use non-root user for better security
 USER node
 
-# Start the backend
-CMD ["node", "dist/server.js"]
+# Run migrations then start the backend
+CMD ["sh", "-c", "node dist/database/migrate.js && node dist/server.js"]
