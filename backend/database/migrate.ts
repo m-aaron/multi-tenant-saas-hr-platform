@@ -62,13 +62,15 @@ async function parseMigrationOrder(): Promise<string[]> {
 export async function runMigrations(): Promise<void> {
     const orderedFiles = await parseMigrationOrder();
 
-    const pool = new Pool({
-        host: env.db.host,
-        port: env.db.port,
-        database: env.db.name,
-        user: env.db.user,
-        password: env.db.password,
-    });
+    const pool = 'url' in env.db
+        ? new Pool({ connectionString: env.db.url })
+        : new Pool({
+            host: env.db.host,
+            port: env.db.port,
+            database: env.db.name,
+            user: env.db.user,
+            password: env.db.password,
+        });
 
     const client = await pool.connect();
 
@@ -116,7 +118,7 @@ export async function runMigrations(): Promise<void> {
         logger.info(
             `[migrate] complete — ${appliedCount} applied, ` +
             `${orderedFiles.length - appliedCount} skipped ` +
-            `(target: ${env.db.name})`,
+            `(target: ${'name' in env.db ? env.db.name : 'DATABASE_URL'})`,
         );
     } finally {
         client.release();
