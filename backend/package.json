@@ -29,31 +29,31 @@
   "imports": {
     "#app.js": {
       "@dev": "./src/app.ts",
-      "default": "./src/app.ts"
+      "default": "./dist/src/app.js"
     },
     "#configs/*.js": {
       "@dev": "./src/configs/*.ts",
-      "default": "./dist/configs/*.js"
+      "default": "./dist/src/configs/*.js"
     },
     "#modules/*.js": {
       "@dev": "./src/modules/*.ts",
-      "default": "./dist/modules/*.js"
+      "default": "./dist/src/modules/*.js"
     },
     "#shared/*.js": {
       "@dev": "./src/shared/*.ts",
-      "default": "./dist/shared/*.js"
+      "default": "./dist/src/shared/*.js"
     },
     "#databases/*.js": {
       "@dev": "./src/databases/*.ts",
-      "default": "./dist/databases/*.js"
+      "default": "./dist/src/databases/*.js"
     },
     "#docs/*.js": {
       "@dev": "./src/docs/*.ts",
-      "default": "./dist/docs/*.js"
+      "default": "./dist/src/docs/*.js"
     },
     "#middlewares/*.js": {
       "@dev": "./src/middlewares/*.ts",
-      "default": "./dist/middlewares/*.js"
+      "default": "./dist/src/middlewares/*.js"
     },
     "#tests/*.js": {
       "@dev": "./tests/*.ts",
