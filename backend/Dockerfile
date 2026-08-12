@@ -52,6 +52,14 @@ RUN pnpm install --prod --frozen-lockfile \
 # Copy compiled application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy SQL migration files (needed by migrate.js at runtime via __dirname resolution)
+COPY --from=builder /app/database/schema.sql ./dist/database/schema.sql
+COPY --from=builder /app/database/migrations ./dist/database/migrations
+
+# Copy and make entrypoint executable
+COPY migrate-and-start.sh ./migrate-and-start.sh
+RUN chmod +x ./migrate-and-start.sh
+
 # Document the application port
 EXPOSE 4000
 
@@ -68,5 +76,5 @@ STOPSIGNAL SIGTERM
 # Use non-root user for better security
 USER node
 
-# Start the backend server
-CMD ["node", "dist/server.js"]
+# Start: run migrations then start the server
+CMD ["/bin/sh", "migrate-and-start.sh"]

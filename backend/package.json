@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch --conditions @dev src/server.ts",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "db:create:test": "cross-env NODE_ENV=test tsx --conditions @dev database/create-db.ts",
     "migrate": "tsx --conditions @dev database/migrate.ts",
     "migrate:test": "cross-env NODE_ENV=test tsx --conditions @dev database/migrate.ts",
