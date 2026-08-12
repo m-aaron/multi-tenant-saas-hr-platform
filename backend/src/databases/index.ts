@@ -3,9 +3,10 @@ import { Pool } from 'pg';
 import { env } from '#configs/env.js';
 
 export const db = new Pool({
-    ...(env.db.url ?
+    ...('url' in env.db ?
         {
-            connectionString: env.db.url
+            connectionString: env.db.url,
+            ...(env.NODE_ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {}),
         } : {
             host: env.db.host,
             port: env.db.port,

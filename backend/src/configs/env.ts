@@ -25,8 +25,16 @@ function getEnv(key: string,): string {
     return value;
 }
 
-function getOptionalEnv(key: string): string | undefined { return process.env[key]; }
-const databaseUrl = getOptionalEnv('DATABASE_URL');
+function getOptionalEnv(key: string): string | undefined {
+    const val = process.env[key];
+    return val && val.trim().length > 0 ? val.trim() : undefined;
+}
+
+const databaseUrl =
+    getOptionalEnv('DATABASE_URL') ??
+    getOptionalEnv('DATABASE_PRIVATE_URL') ??
+    getOptionalEnv('DATABASE_PUBLIC_URL') ??
+    getOptionalEnv('POSTGRES_URL');
 
 export const env = {
     port: Number(process.env['PORT'] ?? 4000),
