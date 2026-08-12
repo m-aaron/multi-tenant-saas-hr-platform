@@ -60,7 +60,7 @@ HEALTHCHECK --interval=30s \
             --timeout=5s \
             --start-period=10s \
             --retries=3 \
-    CMD wget -q --spider http://localhost:4000/api/v1/health || exit 1
+    CMD wget -q --spider http://localhost:${PORT:-4000}/api/v1/health || exit 1
 
 # Graceful shutdown signal
 STOPSIGNAL SIGTERM
