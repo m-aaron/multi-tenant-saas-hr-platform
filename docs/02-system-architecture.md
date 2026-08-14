@@ -1,3 +1,9 @@
+> **Multi-Tenant SaaS HR Platform Documentation**
+>
+> [01 Project Overview](./01-project-overview.md) • **[02 System Architecture](./02-system-architecture.md)** • [03 Database Design](./03-database-design.md) • [04 API Reference](./04-api-reference.md) • [05 Testing Strategy](./05-testing-strategy.md) • [06 Docker Guide](./06-docker-guide.md) • [07 CI/CD Pipeline](./07-ci-cd-pipeline.md) • [08 Deployment Guide](./08-deployment-guide.md) • [09 Development Roadmap](./09-development-roadmap.md) • [10 Future Enhancements](./10-future-enhancements.md)
+
+---
+
 # System Architecture
 
 ## Architecture Overview
@@ -9,6 +15,26 @@ Rather than organizing the codebase around technical components alone, the syste
 The application follows a layered architecture that separates business logic from infrastructure concerns. Requests flow through well-defined layers responsible for routing, validation, application services, domain logic, data persistence, and shared infrastructure. Cross-cutting concerns such as authentication, authorization, logging, configuration management, and error handling are implemented as reusable platform services rather than duplicated across individual modules.
 
 The architecture is intentionally designed to balance simplicity and scalability. A Modular Monolith provides many of the organizational benefits associated with distributed systems while avoiding the operational complexity of microservices during the early stages of product development. This establishes a stable engineering foundation that can support future business growth and architectural evolution without premature optimization.
+
+---
+
+## Table of Contents
+
+- [Architectural Principles](#architectural-principles)
+- [High-Level System Architecture](#high-level-system-architecture)
+- [Backend Architecture](#backend-architecture)
+- [Module Organization](#module-organization)
+- [Layered Architecture](#layered-architecture)
+- [Request Lifecycle](#request-lifecycle)
+- [Dependency Rules](#dependency-rules)
+- [Shared Infrastructure](#shared-infrastructure)
+- [Error Handling Strategy](#error-handling-strategy)
+- [Logging Strategy](#logging-strategy)
+- [Security Architecture](#security-architecture)
+- [Scalability considerations](#scalability-considerations)
+- [Architecture Decisions](#architecture-decisions)
+- [Future Architecture Evolution](#future-architecture-evolution)
+- [Document Index](#document-index)
 
 ---
 

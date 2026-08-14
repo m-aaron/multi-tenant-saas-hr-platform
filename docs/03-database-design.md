@@ -1,3 +1,9 @@
+> **Multi-Tenant SaaS HR Platform Documentation**
+>
+> [01 Project Overview](./01-project-overview.md) • [02 System Architecture](./02-system-architecture.md) • **[03 Database Design](./03-database-design.md)** • [04 API Reference](./04-api-reference.md) • [05 Testing Strategy](./05-testing-strategy.md) • [06 Docker Guide](./06-docker-guide.md) • [07 CI/CD Pipeline](./07-ci-cd-pipeline.md) • [08 Deployment Guide](./08-deployment-guide.md) • [09 Development Roadmap](./09-development-roadmap.md) • [10 Future Enhancements](./10-future-enhancements.md)
+
+---
+
 # Database Design
 
 ## Database Overview
@@ -11,6 +17,24 @@ A normalized relational design is used to minimize data duplication, preserve co
 Because the platform is implemented as a multi-tenant SaaS application, tenant isolation is a fundamental design consideration. Business data is associated with its owning organization to ensure that resources remain logically separated across tenants while sharing the same database infrastructure.
 
 The database is designed to evolve incrementally alongside the application. New entities, relationships, and business capabilities can be introduced without compromising the existing relational model or architectural consistency.
+
+---
+
+## Table of Contents
+
+- [Database Design Principles](#database-design-principles)
+- [Multi-Tenant Data Model](#multi-tenant-data-model)
+- [Entity Relationship Overview](#entity-relationship-overview)
+- [Core Entities](#core-entities)
+- [Relationships](#relationships)
+- [Constraints & Data Integrity](#constraints--data-integrity)
+- [Indexing Strategy](#indexing-strategy)
+- [Transaction Strategy](#transaction-strategy)
+- [Migration Strategy](#migration-strategy)
+- [Data Lifecycle](#data-lifecycle)
+- [Future Database Evolution](#future-database-evolution)
+- [Schema Reference](#schema-reference)
+- [Document Index](#document-index)
 
 ---
 

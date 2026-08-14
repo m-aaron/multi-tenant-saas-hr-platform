@@ -1,3 +1,9 @@
+> **Multi-Tenant SaaS HR Platform Documentation**
+>
+> [01 Project Overview](./01-project-overview.md) • [02 System Architecture](./02-system-architecture.md) • [03 Database Design](./03-database-design.md) • **[04 API Reference](./04-api-reference.md)** • [05 Testing Strategy](./05-testing-strategy.md) • [06 Docker Guide](./06-docker-guide.md) • [07 CI/CD Pipeline](./07-ci-cd-pipeline.md) • [08 Deployment Guide](./08-deployment-guide.md) • [09 Development Roadmap](./09-development-roadmap.md) • [10 Future Enhancements](./10-future-enhancements.md)
+
+---
+
 # API Reference
 
 ## API Reference Overview
@@ -37,6 +43,27 @@ When deployed to production, the API is intended for demonstration, portfolio re
 This document describes the API contract exposed by the current implementation. Endpoint details should remain synchronized with the actual backend routes and application behavior.
 
 The API reference is therefore treated as a living document and should be updated whenever externally visible API behavior changes.
+
+---
+
+## Table of Contents
+
+- [Authentication Endpoints (`/api/v1/auth`)](#authentication)
+- [Organization Endpoints (`/api/v1/organizations`)](#organization-endpoints)
+- [User Endpoints (`/api/v1/users`)](#user-endpoints)
+- [Employee Endpoints (`/api/v1/employees`)](#employee-endpoints)
+- [Department Endpoints (`/api/v1/departments`)](#department-endpoints)
+- [Profile Endpoints (`/api/v1/profile`)](#profile-endpoints)
+- [Activity Log Endpoints (`/api/v1/activities`)](#activity-endpoints)
+- [Audit Log Endpoints (`/api/v1/audits`)](#audit-endpoints)
+- [Health Endpoints (`/api/v1/health`)](#health-endpoints)
+- [Common Request and Response Conventions](#common-request-and-response-conventions)
+- [Error Response Standard](#error-response-standard)
+- [HTTP Status Codes](#http-status-codes)
+- [Pagination, Filtering & Sorting](#pagination-filtering--sorting)
+- [API Examples](#api-examples)
+- [API Evolution](#api-evolution)
+- [Document Index](#document-index)
 
 ---
 
@@ -2556,7 +2583,7 @@ The implementation does not currently expose separate readiness, liveness, depen
 
 ---
 
-## Common Request/Response Conventions
+## Common Request and Response Conventions
 
 The API follows a set of shared conventions for request handling, response formatting, validation, authentication context, and resource identification.
 

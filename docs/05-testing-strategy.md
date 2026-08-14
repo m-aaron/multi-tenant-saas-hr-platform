@@ -1,3 +1,9 @@
+> **Multi-Tenant SaaS HR Platform Documentation**
+>
+> [01 Project Overview](./01-project-overview.md) • [02 System Architecture](./02-system-architecture.md) • [03 Database Design](./03-database-design.md) • [04 API Reference](./04-api-reference.md) • **[05 Testing Strategy](./05-testing-strategy.md)** • [06 Docker Guide](./06-docker-guide.md) • [07 CI/CD Pipeline](./07-ci-cd-pipeline.md) • [08 Deployment Guide](./08-deployment-guide.md) • [09 Development Roadmap](./09-development-roadmap.md) • [10 Future Enhancements](./10-future-enhancements.md)
+
+---
+
 # Testing Strategy Overview
 
 The **Multi-Tenant SaaS HR Platform** uses automated testing to verify application behavior, database interactions, and critical backend workflows.
@@ -5,6 +11,27 @@ The **Multi-Tenant SaaS HR Platform** uses automated testing to verify applicati
 The testing strategy is designed to provide confidence that changes can be introduced without unintentionally breaking existing functionality.
 
 Testing is treated as part of the development workflow rather than as a final step performed only before deployment.
+
+---
+
+## Table of Contents
+
+- [Testing Goals & Approach](#testing-goals)
+- [Testing Pyramid](#testing-pyramid)
+- [Unit Testing](#unit-testing)
+- [Integration Testing](#integration-testing)
+- [Database Testing](#database-testing)
+- [HTTP-Level Testing (Within Integration)](#http-level-testing-within-integration)
+- [Test Environment Configuration](#test-environment-configuration)
+- [Mocking & Test Isolation](#mocking--test-isolation)
+- [Test Data Strategy](#test-data-strategy)
+- [Coverage & Quality Gates](#coverage--quality-gates)
+- [CI Test Execution](#ci-test-execution)
+- [Local Testing Workflow](#local-testing-workflow)
+- [Failure Investigation](#failure-investigation)
+- [Document Index](#document-index)
+
+---
 
 ## Testing Goals
 
