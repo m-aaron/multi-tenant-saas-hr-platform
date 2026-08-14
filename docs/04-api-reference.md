@@ -3567,7 +3567,7 @@ The examples follow the existing `/api/v1` API structure, authentication model, 
 
 Production (deployment pending):
 
-`https://multi-tenant-api.up.railway.app`
+`https://api.yourdomain.com` (or platform domain e.g. `https://your-app.onrender.com` / `https://your-app.up.railway.app`)
 
 > **Note**: Production deployment is currently planned. This URL represents the intended production endpoint. Refer to the [README](../README.md) for the current deployment status.
 

@@ -198,7 +198,7 @@ Health Endpoint
 Database Connectivity Check
     │
     ▼
-Railway Deployment Health
+Production Deployment Health
 ```
 
 The testing strategy therefore provides pre-deployment confidence, while production health checks provide post-deployment operational verification.
@@ -901,7 +901,7 @@ This keeps test database operations isolated from development and production dat
 
 The application uses the same centralized database configuration approach across environments.
 
-The test environment can use the database connection configuration appropriate to the test database, while the production environment uses the Railway-provided `DATABASE_URL`.
+The test environment can use the database connection configuration appropriate to the test database, while the production environment uses the platform-provided `DATABASE_URL`.
 
 This allows the same database access layer to be exercised in different environments without changing application code.
 
@@ -1173,15 +1173,14 @@ This makes database setup an explicit part of automated verification rather than
 
 When a database test fails, the investigation should determine whether the cause is:
 
-- Database configuration
-- Missing environment variables
-- Migration failure
-- SQL query behavior
-- Database constraint violation
-- Incorrect transaction handling
-- Incorrect tenant scoping
-- Invalid test data
-- Unexpected database state
+- Build failure
+- Database migration problem
+- Database connection failure
+- Missing environment variable
+- Port binding issue
+- Production environment variables
+- Public proxy / ingress misconfiguration
+- Application logic bug
 
 The database layer should be tested independently enough that failures can be localized between application logic and PostgreSQL behavior.
 
@@ -2139,7 +2138,7 @@ The test database must remain isolated from development and production databases
 
 The same migration system can also be used when deploying the production application, but the target database changes according to the production environment configuration.
 
-Production uses the Railway PostgreSQL service through:
+Production uses a managed PostgreSQL service through:
 
 ```
 DATABASE_URL
@@ -3031,7 +3030,7 @@ All required checks pass
 Merge to main
    │
    ▼
-Railway Production
+Production Deployment
 ```
 
 The production branch should not be treated as a bypass around failing CI checks.
@@ -3055,8 +3054,8 @@ main
 and:
 
 ```
-Railway
-→ production deployment from main
+Production
+→ deployment from main
 ```
 
 ## Coverage Thresholds
@@ -3211,12 +3210,12 @@ All required checks pass
 Merge to main
     │
     ▼
-Railway Production
+Production Deployment
 ```
 
 The `develop` branch is used for active development, while `main` represents the production branch.
 
-Railway production is connected to `main`, so production deployment is separated from normal development work.
+Production deployment is connected to `main`, so production deployment is separated from normal development work.
 
 ## Test Execution
 
@@ -3365,18 +3364,18 @@ Verification
    ▼
 main
    ↓
-Railway
+Production
 ```
 
-Railway production is connected to `main`, while development work remains on `develop`.
+Production deployment is connected to `main`, while development work remains on `develop`.
 
 This prevents routine development pushes from directly representing production state.
 
-## Railway CI Integration
+## Production CI Integration
 
-Railway provides a **Wait for CI** deployment option for the production service.
+Modern cloud deployment platforms provide automated deployment options that integrate with continuous integration.
 
-When enabled, Railway can wait for the configured GitHub Actions checks to finish successfully before triggering the production deployment.
+When enabled, the hosting platform can wait for the configured GitHub Actions checks to finish successfully before triggering the production deployment.
 
 The resulting flow is:
 
@@ -3393,7 +3392,7 @@ Checks complete
 Checks pass
     │
     ▼
-Railway deployment
+Production deployment
 ```
 
 This creates an additional protection boundary between source changes and production deployment.
@@ -3462,7 +3461,7 @@ The project currently has:
 ✅ Test migration verification
 ✅ Build verification
 ✅ develop → main workflow
-✅ Railway production deployment
+✅ Production deployment pipeline
 ```
 
 The exact GitHub Actions job names, matrix configuration, cache strategy, and workflow-file implementation should remain documented from the repository's current workflow files rather than being inferred.
@@ -3535,7 +3534,7 @@ CI
 main
     │
     ▼
-Railway Production
+Production
 ```
 
 ## 2. Verify the Working Tree
@@ -3743,7 +3742,7 @@ merge
 main
 ```
 
-Railway production is connected to `main`, so changes reaching `main` can trigger the production deployment workflow.
+Production deployment is connected to `main`, so changes reaching `main` can trigger the production deployment workflow.
 
 ## Local Workflow Summary
 
@@ -3790,7 +3789,7 @@ The practical workflow can be summarized as:
 13. Merge to main
     │
     ▼
-14. Railway Production
+14. Production Deployment
 ```
 
 ## When Every Step Is Necessary
@@ -3930,7 +3929,7 @@ The correct approach was to align:
 ```
 Application configuration
         +
-Railway environment variables
+Production environment variables
         +
 PostgreSQL service
 ```
@@ -4038,7 +4037,7 @@ Investigation should verify:
 Public domain
     │
     ▼
-Railway proxy
+Production proxy
     │
     ▼
 Container port
@@ -4074,7 +4073,7 @@ This means:
 Local
 → 4000 fallback
 
-Railway
+Production
 → platform-provided PORT
 ```
 
@@ -4097,7 +4096,7 @@ A CI failure should be reproduced locally whenever practical.
 
 ## Production Deployment Failures
 
-Railway deployment failures should be classified by stage:
+Production deployment failures should be classified by stage:
 
 ```
 Source / checkout
@@ -4177,7 +4176,7 @@ Fixes should be as narrow as possible.
 
 For example, when the migration process finished successfully but did not exit, the investigation did not immediately replace the migration system. Instead, the logger transport was examined and the test environment behavior was adjusted.
 
-Likewise, the Railway `DATABASE_URL` problem was addressed through environment configuration rather than adding unrelated database variables.
+Likewise, any production `DATABASE_URL` issue should be addressed through environment configuration rather than adding unrelated database variables.
 
 The principle is:
 
@@ -4219,7 +4218,7 @@ pnpm build
 Docker verification
     │
     ▼
-Railway deployment
+Production deployment
    ↓
 GET /api/v1/health
 ```
@@ -4267,7 +4266,7 @@ The project's preferred debugging sequence is:
 7. Re-run the affected check
 8. Run broader verification
 9. Commit only after verification passes
-10. Promote through CI and production
+10. Promote through CI and production deployment
 ```
 
 ## Failure Investigation Principle
