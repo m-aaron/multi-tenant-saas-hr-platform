@@ -104,6 +104,52 @@ GitHub Actions automatically verifies the quality of the codebase by performing 
 
 ### High-Level Component Interaction
 
+```mermaid
+graph TB
+    subgraph Clients ["Client Layer"]
+        Web["Web Frontend (SPA)"]
+        APIClient["API Clients / Integrations"]
+        Mobile["Mobile Apps"]
+    end
+
+    subgraph Infrastructure ["Ingress & Networking"]
+        LB["TLS Termination &<br/>Ingress Router"]
+    end
+
+    subgraph AppServer ["Express.js Backend (Modular Monolith)"]
+        Router["Express Router (/api/v1)"]
+        
+        subgraph CrossCutting ["Shared Infrastructure & Middlewares"]
+            Zod["Zod Validation"]
+            Auth["JWT & Tenant Ingress"]
+            RBAC["Role Authorization"]
+            Pino["Pino Structured Logging"]
+            ErrHandler["Central Error Handler"]
+        end
+
+        subgraph Modules ["Business Domain Modules"]
+            direction TB
+            AuthM["auth"]
+            OrgM["organization"]
+            UserM["user & profile"]
+            EmpM["employee"]
+            DeptM["department"]
+            LogM["activity & audit"]
+            HealthM["health"]
+        end
+    end
+
+    subgraph DatabaseLayer ["Data Persistence"]
+        DB[(PostgreSQL 17 / 16)]
+    end
+
+    Web & APIClient & Mobile -->|HTTPS| LB
+    LB --> Router
+    Router --> CrossCutting
+    CrossCutting --> Modules
+    Modules -->|pg Connection Pool| DB
+```
+
 The overall request flow can be summarized as follows:
 
 1. A client application sends an HTTP request to the backend.
@@ -308,6 +354,42 @@ This layered organization improves maintainability, encourages separation of con
 
 Every client request follows a consistent processing pipeline designed to ensure security, validation, maintainability, and predictable application behavior. The request passes through multiple architectural layers before a response is returned to the client.
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Express Router
+    participant Auth as Auth Middleware (authenticate)
+    participant RBAC as Role Authorization (requireRole)
+    participant Zod as Schema Validation (validate)
+    participant Controller as Domain Controller
+    participant Service as Application Service
+    participant Repo as Data Repository
+    participant DB as PostgreSQL Database
+
+    Client->>Router: HTTP Request (Headers + Body + Bearer Token)
+    Router->>Auth: Verify JWT & Tenant Ingress
+    alt Invalid / Expired Token
+        Auth-->>Client: 401 Unauthorized (Error Envelope)
+    end
+    Auth->>RBAC: Check Role Permissions (e.g. Owner/Admin)
+    alt Insufficient Permissions
+        RBAC-->>Client: 403 Forbidden (Error Envelope)
+    end
+    RBAC->>Zod: Validate Request Body / Params
+    alt Invalid Request Schema
+        Zod-->>Client: 400 Bad Request (Validation Error Envelope)
+    end
+    Zod->>Controller: Forward with req.user & req.tenant
+    Controller->>Service: Call Use Case with Typed DTO
+    Service->>Repo: Execute Query with Tenant Scoping
+    Repo->>DB: SQL Query (organization_id = $1)
+    DB-->>Repo: Database Result Rows
+    Repo-->>Service: Domain Entities
+    Service-->>Controller: Business Result / Created Entity
+    Controller-->>Client: 200 OK / 201 Created (Standard JSON Response)
+```
+
 The typical request lifecycle is as follows:
 
 ### 1. Client Request
@@ -316,19 +398,19 @@ A client application sends an HTTP request to one of the platform's REST API end
 
 ### 2. Route Resolution
 
-The **Express.js** routing layer identifies the appropriate endpoint and forwards the request to the corresponding controller.
+The **Express.js** routing layer identifies the appropriate endpoint and forwards the request through the registered middleware pipeline.
 
-### 3. Request Validation
+### 3. Authentication
 
-Incoming request data is validated using **Zod** before any business logic is executed. Invalid requests are rejected immediately with standardized validation responses.
+For protected endpoints, the `authenticate` middleware verifies the user's identity using a JSON Web Token (JWT) and extracts the `userId`, `organizationId`, and `role` into `req.user`.
 
-### 4. Authentication
+### 4. Authorization
 
-For protected endpoints, the authentication middleware verifies the user's identity using a JSON Web Token (JWT).
+When required, the `requireRole` authorization middleware verifies that the authenticated user has sufficient permissions to perform the requested operation based on the platform's Role-Based Access Control (RBAC) model.
 
-### 5. Authorization
+### 5. Request Validation
 
-When required, the authorization middleware verifies that the authenticated user has sufficient permissions to perform the requested operation based on the platform's Role-Based Access Control (RBAC) model.
+Incoming request body, query parameters, and route parameters are validated using **Zod** schemas. Invalid requests are rejected immediately with standardized validation responses before reaching the controller.
 
 ### 6. Controller Execution
 

@@ -103,28 +103,73 @@ This architectural approach provides clear module boundaries, simplifies develop
 - Structured Logging
 - Environment-based Configuration
 
-### High-Level Request Flow
+### High-Level Architecture Overview
 
-```text
-HTTP Request
-        │
-        ▼
-Express Router
-        │
-        ▼
-Validation Middleware
-        │
-        ▼
-Controller
-        │
-        ▼
-Service Layer
-        │
-        ▼
-Repository Layer
-        │
-        ▼
-PostgreSQL
+```mermaid
+graph TD
+    Client["Client Apps / Web / Mobile<br/>(REST API Clients)"]
+    Ingress["TLS Termination &<br/>Ingress Load Balancer"]
+    
+    subgraph AppServer ["Express.js Backend (Modular Monolith)"]
+        Router["Express Router (/api/v1)"]
+        Middleware["Zod Validation • JWT Auth<br/>Tenant Context Ingress"]
+        
+        subgraph DomainModules ["Core Business Domain Modules"]
+            AuthMod["auth"]
+            OrgMod["organization"]
+            UserMod["user & profile"]
+            EmpMod["employee & dept"]
+            LogMod["activity & audit"]
+            HealthMod["health"]
+        end
+        
+        ServiceLayer["Service Layer<br/>(Business Logic & Transactions)"]
+        RepoLayer["Repository Layer<br/>(SQL Data Access)"]
+    end
+    
+    subgraph DataPersistence ["Database & Storage Layer"]
+        DB[(PostgreSQL 17 / 16)]
+    end
+
+    Client -->|HTTPS / JSON| Ingress
+    Ingress --> Router
+    Router --> Middleware
+    Middleware --> DomainModules
+    DomainModules --> ServiceLayer
+    ServiceLayer --> RepoLayer
+    RepoLayer -->|TCP / SSL Pool| DB
+```
+
+### Multi-Tenant Request Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Router as Express Router
+    participant Auth as Auth Middleware (authenticate)
+    participant RBAC as Role Middleware (requireRole)
+    participant Zod as Validation (validate)
+    participant Controller as Domain Controller
+    participant Service as Domain Service
+    participant Repo as Repository Layer
+    participant DB as PostgreSQL Database
+
+    Client->>Router: HTTP Request + Bearer JWT
+    Router->>Auth: authenticate
+    Auth->>Auth: Verify JWT & Inject req.user & req.tenant
+    Auth->>RBAC: requireRole('owner', 'administrator', ...)
+    RBAC->>RBAC: Verify Role Permissions
+    RBAC->>Zod: validate(schema)
+    Zod->>Zod: Validate Request Body / Params
+    Zod->>Controller: Forward Validated Request
+    Controller->>Service: Execute Use Case (DTO)
+    Service->>Repo: Query with Tenant Filter
+    Repo->>DB: SELECT * FROM table WHERE organization_id = $1
+    DB-->>Repo: Tenant-Isolated Data Rows
+    Repo-->>Service: Domain Entities
+    Service-->>Controller: Service Result
+    Controller-->>Client: 200 OK (Standardized JSON Envelope)
 ```
 
 For a detailed explanation of the application architecture, module boundaries, request lifecycle, and design decisions, see **[System Architecture](docs/02-system-architecture.md)**.
@@ -361,19 +406,6 @@ This starts the complete development environment, including:
 - Backend API
 - PostgreSQL database
 - Docker networking
-- Health monitoring
-
-### Production Image
-
-The application uses a production-oriented multi-stage Docker build to produce a lightweight runtime image.
-
-Production container features include:
-
-- Multi-stage build process
-- Production dependency installation
-- Non-root container execution
-- Built-in health check
-- Environment-based configuration
 
 For complete Docker documentation, container architecture, and troubleshooting, see the [Docker Guide](docs/06-docker-guide.md).
 
@@ -387,11 +419,26 @@ The project uses **GitHub Actions** to automatically validate every code change,
 
 Every push and pull request to the `main` or `develop` branch automatically performs the following validation steps:
 
-- TypeScript type checking
-- ESLint code quality validation
-- Automated test execution with coverage reporting
-- Coverage report artifact upload
-- Docker image build verification
+```mermaid
+flowchart TD
+    Start(["git push / PR<br/>to main or develop"]) --> Init["GitHub Actions Runner<br/>(Node.js 24)"]
+    Init --> ServiceDB["PostgreSQL 17 Alpine Container<br/>(Port 5434)"]
+    ServiceDB --> Install["Install Dependencies<br/>(pnpm install --frozen-lockfile)"]
+    Install --> Gate1["Step 1: Database Migrations<br/>(pnpm migrate:test)"]
+    Gate1 --> Gate2["Step 2: TypeScript Type Check<br/>(pnpm tsc --noEmit)"]
+    Gate2 --> Gate3["Step 3: Code Linting<br/>(pnpm lint)"]
+    Gate3 --> Gate4["Step 4: Automated Tests & Coverage<br/>(Vitest: 338 tests)"]
+    Gate4 --> Coverage["Step 5: Upload Coverage Artifacts<br/>(14-day retention)"]
+    Coverage --> Gate5["Step 6: Multi-Stage Docker Build<br/>(backend/Dockerfile)"]
+    Gate5 --> Success["✅ All Quality Gates Passed<br/>(Ready to Deploy)"]
+```
+
+- Database migrations against isolated test container (`pnpm migrate:test`)
+- TypeScript type checking (`pnpm tsc --noEmit`)
+- ESLint code quality validation (`pnpm lint`)
+- Automated test execution with coverage reporting (24 suites, 338 tests)
+- Coverage report artifact upload (HTML/LCOV)
+- Multi-stage Docker image build verification (`backend/Dockerfile`)
 
 This automated workflow helps detect issues early, reduces integration problems, and ensures that every change meets the project's quality standards before being merged.
 

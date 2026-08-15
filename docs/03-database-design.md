@@ -190,6 +190,98 @@ Records security and compliance events, tracking data changes with entity refere
 
 ### High-Level Relationship Model
 
+```mermaid
+erDiagram
+    ORGANIZATIONS ||--o{ ROLES : "defines"
+    ORGANIZATIONS ||--o{ DEPARTMENTS : "contains"
+    ORGANIZATIONS ||--o{ EMPLOYEES : "employs"
+    ORGANIZATIONS ||--o{ USERS : "owns"
+    ORGANIZATIONS ||--o{ ACTIVITY_LOGS : "records"
+    ORGANIZATIONS ||--o{ AUDIT_LOGS : "tracks"
+
+    DEPARTMENTS ||--o{ EMPLOYEES : "assigns"
+
+    ROLES ||--o{ USERS : "authorizes"
+    EMPLOYEES ||--o| USERS : "links_to"
+
+    USERS ||--|| PROFILES : "has"
+    USERS ||--o{ SESSIONS : "authenticates"
+    USERS ||--o{ ACTIVITY_LOGS : "performs"
+    USERS ||--o{ AUDIT_LOGS : "triggers"
+
+    ORGANIZATIONS {
+        uuid id PK
+        string name
+        string slug UK
+    }
+
+    ROLES {
+        uuid id PK
+        uuid organization_id FK
+        string name
+    }
+
+    DEPARTMENTS {
+        uuid id PK
+        uuid organization_id FK
+        string name
+    }
+
+    EMPLOYEES {
+        uuid id PK
+        uuid organization_id FK
+        uuid department_id FK "nullable"
+        string first_name
+        string middle_name
+        string last_name
+        string name_extension
+        string job_title
+        string employment_status
+        date hire_date
+    }
+
+    USERS {
+        uuid id PK
+        uuid organization_id FK
+        uuid employee_id FK
+        uuid role_id FK
+        string email UK
+        string password_hash
+        string status
+    }
+
+    PROFILES {
+        uuid id PK
+        uuid user_id FK
+        string avatar_url
+    }
+
+    SESSIONS {
+        uuid id PK
+        uuid organization_id FK
+        uuid user_id FK
+        string refresh_token_hash
+    }
+
+    ACTIVITY_LOGS {
+        uuid id PK
+        uuid organization_id FK
+        uuid actor_id FK "nullable"
+        string entity_type
+        jsonb metadata
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        uuid organization_id FK
+        uuid actor_id FK "nullable"
+        string action
+        string entity
+        uuid entity_id
+        jsonb metadata
+    }
+```
+
 The primary relationships between entities can be summarized as follows:
 
 - An **Organization** owns many **Users**, **Employees**, and **Departments**.

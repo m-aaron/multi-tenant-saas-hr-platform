@@ -343,22 +343,18 @@ This guarantees that:
 
 The test-and-build pipeline defines the technical validation steps executed both locally and during CI.
 
-```text
-Source Code (backend/src/)
-    ↓
-pnpm install --frozen-lockfile --prefer-offline
-    ↓
-pnpm migrate:test (against postgres:17-alpine)
-    ↓
-pnpm tsc --noEmit (Type check)
-    ↓
-pnpm lint (ESLint)
-    ↓
-pnpm test:coverage (Vitest: 338 tests)
-    ↓
-pnpm build (tsc -> backend/dist/)
-    ↓
-Docker Multi-Stage Build (node:24-alpine)
+```mermaid
+flowchart TD
+    Start(["git push / PR<br/>to main or develop"]) --> Runner["GitHub Actions Runner<br/>(Node.js 24)"]
+    Runner --> SetupDB["PostgreSQL 17 Alpine Container<br/>(Port 5434)"]
+    SetupDB --> Install["Install Dependencies<br/>(pnpm install --frozen-lockfile)"]
+    Install --> Gate1["Step 1: Database Migrations<br/>(pnpm migrate:test)"]
+    Gate1 --> Gate2["Step 2: TypeScript Type Check<br/>(pnpm tsc --noEmit)"]
+    Gate2 --> Gate3["Step 3: Code Linting<br/>(pnpm lint)"]
+    Gate3 --> Gate4["Step 4: Automated Tests & Coverage<br/>(Vitest: 338 tests)"]
+    Gate4 --> Upload["Step 5: Upload Coverage Artifacts<br/>(14-day retention)"]
+    Upload --> Gate5["Step 6: Multi-Stage Docker Build<br/>(backend/Dockerfile)"]
+    Gate5 --> Done(["✅ All Quality Gates Passed<br/>(Ready to Deploy)"])
 ```
 
 ### Pipeline Reproducibility
