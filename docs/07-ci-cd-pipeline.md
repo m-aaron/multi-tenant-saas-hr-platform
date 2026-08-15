@@ -673,17 +673,17 @@ The CI/CD pipeline is production infrastructure and requires regular operational
 
 ## Document Index
 
-This document is part of the **Multi-Tenant SaaS HR Platform** technical documentation suite.
+This document is part of the **Multi-Tenant SaaS HR Platform** technical documentation suite:
 
-| Document                                                | Description                                                                     |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [01 — Project Overview](./01-project-overview.md)       | Business domain, project goals, and overall scope                               |
-| [02 — System Architecture](./02-system-architecture.md) | Application architecture, module organization, and request lifecycle            |
-| [03 — Database Design](./03-database-design.md)         | Entity relationships, database schema, and design decisions                     |
-| [04 — API Reference](./04-api-reference.md)             | REST API conventions, endpoints, request/response standards, and authentication |
-| [05 — Testing Strategy](./05-testing-strategy.md)       | Testing approach, project structure, and quality assurance practices            |
-| [06 — Docker Guide](./06-docker-guide.md)               | Local development, production containers, and Docker workflow                   |
-| **07 — CI/CD Pipeline** _(this document)_               | GitHub Actions workflow, automated validation, and Docker verification          |
-| [08 — Deployment Guide](./08-deployment-guide.md)       | Production deployment process and infrastructure configuration                  |
-| [09 — Development Roadmap](./09-development-roadmap.md) | Development phases, completed milestones, and future work                       |
-| [10 — Future Enhancements](./10-future-enhancements.md) | Planned improvements, scalability considerations, and long-term vision          |
+| Document                                                | Description                                                      |
+| :------------------------------------------------------ | :--------------------------------------------------------------- |
+| [01 — Project Overview](./01-project-overview.md)       | Business domain, multi-tenancy model, and system scope           |
+| [02 — System Architecture](./02-system-architecture.md) | Layered modular architecture, request lifecycle, and security    |
+| [03 — Database Design](./03-database-design.md)         | Relational PostgreSQL schema, indexes, and tenant isolation      |
+| [04 — API Reference](./04-api-reference.md)             | REST API conventions, endpoints, request/response specifications |
+| [05 — Testing Strategy](./05-testing-strategy.md)       | Test hierarchy, domain coverage, and QA verification             |
+| [06 — Docker Guide](./06-docker-guide.md)               | Multi-stage Docker packaging, Compose, and container security    |
+| **07 — CI/CD Pipeline** _(this document)_               | GitHub Actions CI, 5-layer quality gates, and cloud deployment   |
+| [08 — Deployment Guide](./08-deployment-guide.md)       | Production cloud deployment, database hosting, and monitoring    |
+| [09 — Development Roadmap](./09-development-roadmap.md) | Development phases, completed milestones, and future work        |
+| [10 — Future Enhancements](./10-future-enhancements.md) | Enterprise roadmap, Redis caching, microservices, and AI         |
