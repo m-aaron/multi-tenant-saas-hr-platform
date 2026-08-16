@@ -189,19 +189,35 @@ Step 8: Docker Multi-Stage Build Verification (docker build)
 Pipeline Status: PASS / FAIL
 ```
 
-### Workflow Specification
+### Workflow Specifications
 
-The authoritative workflow is defined in `.github/workflows/backend.yml`:
+#### 1. Continuous Integration Workflow (`.github/workflows/backend.yml`)
+
+The authoritative CI workflow verifies code quality, executes test suites, and publishes production container images:
 
 | Configuration Attribute | Value                                                       | Engineering Rationale                                                      |
 | :---------------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------- |
 | **Workflow Name**       | `Backend CI`                                                | Authoritative CI verification suite for backend services                   |
-| **Triggers**            | `push`, `pull_request` (`main`, `develop`)                  | Validates PRs before merge and validates the post-merge commit             |
-| **Permissions**         | `contents: read`                                            | Principle of least privilege; CI token has read-only repository access     |
+| **Triggers**            | `push`, `pull_request` (`main`, `develop`)                  | Validates PRs before merge and validates post-merge commits                |
+| **Permissions**         | `contents: read`, `packages: write`                         | Read-only repository access + write permissions for GHCR image publishing  |
 | **Concurrency**         | `backend-ci-${{ github.ref }}` (`cancel-in-progress: true`) | Automatically cancels redundant in-flight runs when new commits are pushed |
 | **Runner OS**           | `ubuntu-latest`                                             | Clean, reproducible virtualized Linux environment                          |
 | **Job Timeout**         | `20 minutes`                                                | Prevents hanging processes from consuming unnecessary runner minutes       |
 | **Node.js & pnpm**      | Node `24` + pnpm `11.9.0` (Corepack)                        | Matches production Node version with deterministic lockfile enforcement    |
+| **Artifact Publishing** | `ghcr.io/${{ github.repository }}`                          | Publishes `sha-<commit>` (immutable) and `latest` container tags on `main` |
+
+#### 2. Continuous Deployment Workflow (`.github/workflows/cd.yml`)
+
+The authoritative CD workflow handles release verification, immutable digest resolution, and deployment audit tracking:
+
+| Configuration Attribute | Value                                                       | Engineering Rationale                                                      |
+| :---------------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------- |
+| **Workflow Name**       | `Backend CD`                                                | Post-CI release verification and production deployment tracking            |
+| **Triggers**            | `workflow_run` (on `Backend CI` completion), `workflow_dispatch` | Automatically triggers upon successful CI on `main`; supports manual runs |
+| **Permissions**         | `contents: read`, `packages: read`                          | Least privilege; read access to pull and inspect published GHCR images     |
+| **Concurrency**         | `production-deployment` (`cancel-in-progress: false`)       | Guarantees atomic deployment without canceling active release runs         |
+| **Digest Inspection**   | `docker image inspect` (`--format RepoDigests`)             | Resolves exact `sha256:xxxx` digest to verify zero-drift release artifacts  |
+| **Deployment Target**   | Railway Cloud Git Integration                               | Synchronizes release verification with live cloud container deployment     |
 
 ### CI PostgreSQL Service Container
 
