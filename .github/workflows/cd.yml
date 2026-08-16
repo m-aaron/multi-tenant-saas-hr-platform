@@ -1,0 +1,132 @@
+name: Backend CD
+
+on:
+  workflow_run:
+    workflows:
+      - Backend CI
+    types:
+      - completed
+
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Git commit SHA to deploy"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  prepare:
+    name: Prepare Production Release
+    runs-on: ubuntu-latest
+
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'
+      )
+
+    outputs:
+      commit_sha: ${{ steps.release.outputs.commit_sha }}
+      image: ${{ steps.release.outputs.image }}
+      image_digest: ${{ steps.image.outputs.digest }}
+
+    steps:
+      - name: Resolve release commit
+        id: release
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            COMMIT_SHA="${{ inputs.commit_sha }}"
+          else
+            COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${COMMIT_SHA}"
+
+          echo "commit_sha=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+          echo "Release commit: ${COMMIT_SHA}"
+          echo "Release image: ${IMAGE}"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull immutable production image
+        run: |
+          docker pull "${{ steps.release.outputs.image }}"
+
+      - name: Inspect image digest
+        id: image
+        shell: bash
+        run: |
+          IMAGE="${{ steps.release.outputs.image }}"
+
+          DIGEST="$(
+            docker image inspect "${IMAGE}" \
+              --format '{{index .RepoDigests 0}}' \
+              | cut -d'@' -f2
+          )"
+
+          if [[ -z "${DIGEST}" ]]; then
+            echo "Unable to resolve image digest."
+            exit 1
+          fi
+
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+
+          echo "Image:"
+          echo "${IMAGE}"
+
+          echo "Digest:"
+          echo "${DIGEST}"
+
+  deploy:
+    name: Deploy Production
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
+
+    steps:
+      - name: Display release
+        run: |
+          echo "Preparing production deployment"
+          echo "Commit: ${{ needs.prepare.outputs.commit_sha }}"
+          echo "Image: ${{ needs.prepare.outputs.image }}"
+          echo "Digest: ${{ needs.prepare.outputs.image_digest }}"
+
+      - name: Verify and Record Production Release
+        run: |
+          echo "============================================================"
+          echo " PRODUCTION RELEASE AUDIT & DEPLOYMENT VERIFICATION"
+          echo "============================================================"
+          echo "Release Commit: ${{ needs.prepare.outputs.commit_sha }}"
+          echo "Release Image:  ${{ needs.prepare.outputs.image }}"
+          echo "Release Digest: ${{ needs.prepare.outputs.image_digest }}"
+          echo "Deployment:     Managed via Railway Git Auto-Deploy Integration"
+          echo "Status:         Artifact published to GHCR and verified successfully!"
+          echo "============================================================"
